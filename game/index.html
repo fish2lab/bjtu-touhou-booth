@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>北京交通大学 · 幻想乡交通大学号 弹幕演示</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+@font-face { font-family: 'Xiaolai'; src: url(fonts/Xiaolai-sub.woff2) format('woff2'); font-display: block; }
+@font-face { font-family: 'NotoSansSC'; font-weight: 500; src: url(fonts/NotoSansSC-Medium-sub.woff2) format('woff2'); font-display: block; }
+@font-face { font-family: 'NotoSansSC'; font-weight: 400; src: url(fonts/NotoSansSC-Regular-sub.woff2) format('woff2'); font-display: block; }
+@font-face { font-family: 'NotoSerifSC'; font-weight: 900; src: url(fonts/NotoSerifSC-Black-sub.woff2) format('woff2'); font-display: block; }
+@font-face { font-family: 'SpaceMono'; font-weight: 400; src: url(../assets/fonts/SpaceMono-Regular.ttf); font-display: block; }
+@font-face { font-family: 'SpaceMono'; font-weight: 700; src: url(../assets/fonts/SpaceMono-Bold.ttf); font-display: block; }
+
+html, body { margin: 0; height: 100%; background: #0b0e24; overflow: hidden; }
+body { opacity: 0; transition: opacity .3s; }
+body.ready { opacity: 1; }
+#stage { position: absolute; left: 0; top: 0; width: 3840px; height: 2160px; transform-origin: 0 0; overflow: hidden; font-family: 'NotoSansSC', sans-serif; }
+#desk { position: absolute; left: 0; top: 0; }
+#field { position: absolute; left: 140px; top: 60px; width: 1648px; height: 1920px; overflow: hidden; }
+#gl { position: absolute; left: 0; top: 0; }
+#frame { position: absolute; pointer-events: none; }
+.hand { font-family: 'Xiaolai', sans-serif; font-weight: 400; }
+.mono { font-family: 'SpaceMono', monospace; }
+.serif { font-family: 'NotoSerifSC', serif; font-weight: 900; }
+
+/* ---------- 场地 HUD ---------- */
+#hud { position: absolute; inset: 0; pointer-events: none; color: #fbf7ec; }
+#bossbar { position: absolute; left: 40px; right: 40px; top: 30px; height: 60px; display: flex; align-items: center; gap: 22px; }
+#bossbar .name { font-size: 50px; line-height: 1; text-shadow: 0 3px 0 rgba(10,12,34,.7); }
+#hp { position: relative; flex: 1; height: 26px; background: #fbf7ec; border-radius: 4px;
+  clip-path: polygon(0 12%, 3% 0, 11% 8%, 20% 0, 34% 10%, 47% 2%, 61% 9%, 75% 0, 88% 10%, 100% 3%, 99% 90%, 86% 100%, 72% 88%, 58% 100%, 44% 92%, 30% 100%, 16% 90%, 5% 100%, 0 88%); }
+#hp-fill { position: absolute; left: 4px; top: 4px; bottom: 4px; right: 4px; transform-origin: 0 50%;
+  background: repeating-linear-gradient(-55deg, #e2463c 0 10px, #cf3a33 10px 16px, #ea5b4f 16px 24px); }
+#timer { font-size: 70px; line-height: 1; min-width: 150px; text-align: right; text-shadow: 0 3px 0 rgba(10,12,34,.7); }
+#spell { position: absolute; right: 36px; top: 100px; transform-origin: 100% 50%; }
+#spell canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+#spell b { position: relative; display: block; font-weight: 400; font-size: 56px; line-height: 1; padding: 22px 40px 26px; color: #1b2150; white-space: nowrap; }
+#lives, #bombs { position: absolute; left: 30px; display: flex; gap: 6px; align-items: flex-end; }
+#lives { bottom: 96px; }
+#bombs { bottom: 26px; }
+#msg { position: absolute; left: 50%; top: 40%; opacity: 0; }
+#msg canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+#msg b { position: relative; display: block; font-weight: 400; font-size: 150px; line-height: 1; padding: 40px 80px 50px; color: #1b2150; white-space: nowrap; }
+
+/* ---------- cut-in ---------- */
+#cutin { position: absolute; inset: 0; visibility: hidden; pointer-events: none; }
+#cutin .band { position: absolute; left: -12%; width: 124%; top: 820px; height: 360px; }
+#cutin .band canvas { width: 100%; height: 100%; display: block; }
+#cutin img { position: absolute; right: 40px; top: 470px; height: 1000px;
+  filter: drop-shadow(6px 0 0 #fbf7ec) drop-shadow(-6px 0 0 #fbf7ec) drop-shadow(0 6px 0 #fbf7ec) drop-shadow(0 -6px 0 #fbf7ec) drop-shadow(0 20px 26px rgba(0,0,0,.5)); }
+
+/* ---------- 底栏 ---------- */
+#hint { position: absolute; left: 140px; top: 2008px; width: 1648px; height: 120px; display: flex; align-items: center; justify-content: center; gap: 24px; color: #fbf7ec; }
+#hint b { font-weight: 400; font-size: 54px; white-space: nowrap; }
+#hint.player b { color: #f6c63f; }
+#sign { position: absolute; right: 80px; top: 1990px; height: 150px; display: flex; align-items: center; gap: 26px; color: #fbf7ec; }
+#sign b { font-weight: 400; font-size: 112px; line-height: 1; letter-spacing: .04em; }
+#sign canvas { width: 104px; height: 136px; }
+
+#dbg { position: absolute; left: 150px; top: 70px; z-index: 9; font: 30px/1.3 'SpaceMono', monospace; color: #0f0; background: rgba(0,0,0,.6); padding: 6px 12px; white-space: pre-wrap; max-width: 3500px; }
+
+/* ---------- 宣传栏通用 ---------- */
+.panel { position: absolute; left: 1860px; top: 60px; width: 1900px; height: 1920px; visibility: hidden; opacity: 0; }
+.panel.on { visibility: visible; }
+.panel > .sheet { position: absolute; left: -18px; top: -18px; width: 1936px; height: 1956px; filter: drop-shadow(0 18px 28px rgba(0,0,0,.5)); }
+.abs { position: absolute; }
+.tape { position: absolute; width: 250px; height: 74px; background: rgba(246,208,110,.78);
+  background-image: repeating-linear-gradient(90deg, rgba(255,255,255,.18) 0 7px, transparent 7px 16px);
+  clip-path: polygon(0 8%, 4% 0, 8% 12%, 12% 2%, 88% 4%, 92% 0, 96% 14%, 100% 6%, 98% 50%, 100% 94%, 95% 86%, 91% 100%, 86% 90%, 10% 96%, 6% 88%, 2% 100%, 0 90%, 3% 50%);
+  box-shadow: 0 2px 6px rgba(0,0,0,.15); z-index: 2; }
+.tape.pink { background-color: rgba(240,150,180,.72); }
+.tape.blue { background-color: rgba(140,180,235,.72); }
+figure { margin: 0; }
+.photo { position: absolute; }
+.photo img { display: block; width: 100%; box-shadow: 0 16px 30px rgba(0,0,0,.35), 0 2px 4px rgba(0,0,0,.25); }
+
+/* 1 红黑：笔记本纸 + 两枚吧唧 + 手写 */
+#p-badge .badge { position: absolute; width: 760px; height: 760px; }
+#p-badge .badge img { width: 100%; height: 100%; border-radius: 50%; display: block; filter: drop-shadow(0 18px 22px rgba(0,0,0,.35)); }
+#p-badge h2 { position: absolute; left: 0; right: 0; top: 1010px; margin: 0; text-align: center; font-size: 206px; line-height: 1.24; color: #2d5bb5; }
+
+/* 北交摊宣：黑白漫画版式 */
+.m-head { position: absolute; left: 90px; top: 80px; display: flex; align-items: center; gap: 26px; color: #111; }
+.m-tag { background: #111; color: #fff; font-family: 'NotoSerifSC', serif; font-weight: 900; font-size: 64px; line-height: 1; padding: 16px 22px 20px; }
+.m-vol { font-family: 'NotoSerifSC', serif; font-weight: 900; font-size: 72px; line-height: 1; }
+.m-en { font-size: 34px; letter-spacing: .12em; color: #333; }
+.vblk { writing-mode: vertical-rl; margin: 0; background: #111; color: #fff; font-family: 'NotoSerifSC', serif; font-weight: 900; line-height: 1.12; padding: 34px 20px; letter-spacing: .02em; }
+.vpair { position: absolute; display: flex; flex-direction: row-reverse; gap: 38px; align-items: flex-start; }
+.hblk { position: absolute; margin: 0; background: #111; color: #fff; font-family: 'NotoSerifSC', serif; font-weight: 900; line-height: 1; }
+.m-title { position: absolute; margin: 0; font-family: 'NotoSerifSC', serif; font-weight: 900; color: #111; line-height: 1.1; white-space: nowrap; }
+.m-body { position: absolute; margin: 0; font-family: 'NotoSerifSC', serif; font-weight: 900; color: #111; line-height: 1.36; }
+.hnote { position: absolute; margin: 0; font-family: 'Xiaolai', sans-serif; line-height: 1.15; white-space: nowrap; }
+.inv { background: #111; color: #fff; padding: 0 .06em; }
+.bubble { position: absolute; }
+.bubble canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.bubble p { position: absolute; left: 0; right: 0; top: 36%; margin: 0; transform: translateY(-50%); text-align: center; font-family: 'NotoSerifSC', serif; font-weight: 900; font-size: 84px; color: #111; }
+
+/* 4 隙间月影：照 sukima-ml 宣传册的克制编辑排版（不用手写体，不贴胶带） */
+#p-sukima .sk { position: absolute; inset: 0; background: #F7F6F4; color: #111; box-shadow: 0 18px 30px rgba(0,0,0,.45); }
+#p-sukima .brand { position: absolute; left: 90px; top: 78px; right: 90px; display: flex; align-items: center; gap: 24px; }
+#p-sukima .brand img { width: 84px; height: 84px; border-radius: 50%; }
+#p-sukima .brand .en { font-size: 40px; font-weight: 700; letter-spacing: .16em; }
+#p-sukima .brand .cn { font-size: 40px; font-weight: 500; }
+#p-sukima .brand .est { margin-left: auto; font-size: 32px; letter-spacing: .12em; color: #777772; }
+#p-sukima h2 { position: absolute; left: 84px; top: 214px; margin: 0; font-size: 184px; line-height: 1.1; font-weight: 500; letter-spacing: -.01em; }
+#p-sukima .sub { position: absolute; left: 92px; top: 432px; margin: 0; font-size: 36px; letter-spacing: .2em; color: #777772; }
+#p-sukima .quote { position: absolute; left: 92px; top: 500px; margin: 0; font-size: 80px; line-height: 1.2; color: #4B2A63; font-weight: 400; }
+#p-sukima .rule { position: absolute; left: 90px; right: 90px; height: 2px; background: #111; }
+#p-sukima .work { position: absolute; left: 90px; right: 90px; top: 660px; height: 900px; opacity: 0; }
+#p-sukima .art { position: absolute; left: 0; top: 0; width: 700px; height: 900px; background: #fff; border: 3px solid #111; box-sizing: border-box; padding: 26px; display: flex; align-items: center; justify-content: center; }
+#p-sukima .art img { max-width: 100%; max-height: 100%; display: block; }
+#p-sukima .orig { position: absolute; left: 520px; top: 640px; width: 230px; background: #F7F6F4; border: 2px solid #111; padding: 12px 12px 8px; }
+#p-sukima .orig img { width: 100%; height: 200px; object-fit: cover; display: block; }
+#p-sukima .orig span { display: block; font-size: 24px; letter-spacing: .18em; margin-top: 8px; }
+#p-sukima .info { position: absolute; left: 790px; right: 0; top: 0; bottom: 0; }
+#p-sukima .lab { margin: 0; font-size: 36px; letter-spacing: .16em; color: #777772; }
+#p-sukima h3 { margin: 10px 0 0; font-size: 90px; line-height: 1.12; font-weight: 500; }
+#p-sukima .hr { height: 2px; background: #D9D9D5; margin: 26px 0 20px; }
+#p-sukima dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; row-gap: 12px; align-items: baseline; }
+#p-sukima dt { font-size: 38px; color: #777772; }
+#p-sukima dd { margin: 0; font-size: 80px; line-height: 1.12; font-weight: 400; }
+#p-sukima table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+#p-sukima td { font-size: 80px; line-height: 1.1; padding: 8px 0; border-bottom: 2px solid #D9D9D5; font-weight: 400; }
+#p-sukima td:last-child { text-align: right; font-family: 'SpaceMono', monospace; font-weight: 700; }
+#p-sukima .note { margin: 14px 0 0; font-size: 38px; color: #777772; }
+#p-sukima .foot { position: absolute; left: 90px; right: 90px; top: 1600px; height: 260px; display: flex; gap: 60px; align-items: center; }
+#p-sukima .foot .qr { width: 260px; height: 260px; display: block; }
+#p-sukima .foot .big { margin: 2px 0 18px; font-size: 80px; line-height: 1.1; }
+#p-sukima .foot .big.m { font-family: 'SpaceMono', monospace; font-weight: 700; font-size: 76px; }
+#p-sukima .foot .tail { position: absolute; right: 0; bottom: -2px; font-size: 30px; letter-spacing: .16em; color: #777772; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="desk" width="3840" height="2160"></canvas>
+
+  <div id="field">
+    <div id="hud">
+      <div id="bossbar"><span class="name hand">八云紫</span><div id="hp"><div id="hp-fill"></div></div><span id="timer" class="hand">0.0</span></div>
+      <div id="spell"><canvas data-art="label:41:#f3ead2" width="900" height="120"></canvas><b class="hand"></b></div>
+      <div id="lives"></div>
+      <div id="bombs"></div>
+      <div id="msg"><canvas data-art="label:43:#f6c63f" width="900" height="240"></canvas><b class="hand"></b></div>
+    </div>
+    <div id="cutin">
+      <div class="band"><canvas data-art="band:31" width="2100" height="360"></canvas></div>
+      <img src="../assets/img/yukari-trim.webp" alt="">
+    </div>
+  </div>
+  <canvas id="frame"></canvas>
+
+  <div id="hint" class="hand"><b></b></div>
+  <div id="sign" class="hand"><canvas data-art="tram" width="104" height="136"></canvas><b>北京交通大学</b></div>
+
+  <!-- 1 红黑：请和大家分享你对作品的喜欢吧！ -->
+  <section class="panel" data-panel="badge" id="p-badge">
+    <canvas class="sheet" data-art="note:11" width="1936" height="1956"></canvas>
+    <figure class="badge" style="left:120px;top:150px;transform:rotate(-6deg)"><img src="../assets/img/badge-yes.png" alt=""><i class="tape pink" style="left:250px;top:-30px;transform:rotate(-4deg)"></i></figure>
+    <figure class="badge" style="right:110px;top:200px;transform:rotate(5deg)"><img src="../assets/img/badge-no.png" alt=""><i class="tape blue" style="left:260px;top:-28px;transform:rotate(3deg)"></i></figure>
+    <canvas class="abs" data-art="heart:52:#e2463c" width="170" height="160" style="left:60px;top:830px;transform:rotate(-12deg)"></canvas>
+    <canvas class="abs" data-art="heart:53:#f07ea4" width="110" height="104" style="left:230px;top:900px;transform:rotate(10deg)"></canvas>
+    <canvas class="abs" data-art="star:62:#f6c63f" width="130" height="130" style="right:120px;top:880px"></canvas>
+    <canvas class="abs" data-art="star:63:#f6c63f" width="80" height="80" style="right:270px;top:960px"></canvas>
+    <h2 class="hand">请和大家分享<br>你对作品的喜欢吧！</h2>
+    <canvas class="abs" data-art="wave:92:#2d5bb5" width="1300" height="60" style="left:300px;top:1560px"></canvas>
+    <canvas class="abs" data-art="heart:54:#e2463c" width="140" height="130" style="left:860px;top:1690px;transform:rotate(-6deg)"></canvas>
+  </section>
+
+  <!-- 2 厄符：北交摊宣 Vol.2 -->
+  <section class="panel" data-panel="hina" id="p-hina">
+    <canvas class="sheet" data-art="manga:21" width="1936" height="1956"></canvas>
+    <div class="m-head"><span class="m-tag">北交摊宣</span><span class="m-vol">Vol.2</span><span class="mono m-en">BEIJING TOUHOUCOMMUNITY</span></div>
+    <figure class="photo" style="left:90px;top:250px;width:1000px;transform:rotate(-2deg)"><img src="../assets/img/flyer-vol2.jpg" alt=""><i class="tape" style="left:-60px;top:10px;transform:rotate(-36deg)"></i><i class="tape" style="right:-60px;top:10px;transform:rotate(38deg)"></i></figure>
+    <div class="vpair" style="right:84px;top:250px">
+      <h2 class="vblk" style="font-size:190px">留下想说的话</h2>
+      <p class="vblk" style="font-size:100px">雏人偶会把厄运带走吧——</p>
+    </div>
+    <p class="hnote" style="left:1150px;top:1700px;font-size:104px;color:#cf2440">键山雏</p>
+    <p class="hnote" style="left:1150px;top:1818px;font-size:58px;color:#cf2440">Kagiyama Hina</p>
+    <canvas class="abs" data-art="arrow:72:#cf2440:1" width="260" height="170" style="left:1010px;top:1560px;transform:rotate(-8deg)"></canvas>
+  </section>
+
+  <!-- 3 魔药：北交摊宣 Vol.3 -->
+  <section class="panel" data-panel="alchemy" id="p-alchemy">
+    <canvas class="sheet" data-art="manga:22" width="1936" height="1956"></canvas>
+    <div class="m-head"><span class="m-tag">北交摊宣</span><span class="m-vol">Vol.3</span><span class="mono m-en">BEIJING TOUHOUCOMMUNITY</span></div>
+    <p class="hblk" style="left:90px;top:236px;font-size:84px;padding:16px 36px 20px">「パチュリの錬金工房」</p>
+    <h2 class="m-title" style="left:84px;top:370px;font-size:204px">帕秋莉的炼金工坊</h2>
+    <p class="m-body" style="left:92px;top:640px;font-size:92px">猜猜魔药是由谁的魔力构成的<br>猜对了有奖励</p>
+    <figure class="photo" style="left:100px;top:960px;width:620px;transform:rotate(2.5deg)"><img src="../assets/img/flyer-vol3.jpg" alt=""><i class="tape" style="left:190px;top:-34px;transform:rotate(-3deg)"></i></figure>
+    <canvas class="abs" data-art="bottle:0:#ef6a3a" width="250" height="330" style="left:800px;top:1030px;transform:rotate(-5deg)"></canvas>
+    <p class="hnote" style="left:1062px;top:1120px;font-size:130px;color:#111">+</p>
+    <canvas class="abs" data-art="bottle:1:#3f86d8" width="250" height="330" style="left:1140px;top:1000px"></canvas>
+    <p class="hnote" style="left:1402px;top:1120px;font-size:130px;color:#111">+</p>
+    <canvas class="abs" data-art="bottle:2:#48a852" width="250" height="330" style="left:1480px;top:1030px;transform:rotate(5deg)"></canvas>
+    <p class="hnote" style="left:880px;top:1440px;font-size:96px;color:#6b3fa8">帕秋莉·诺蕾姬</p>
+    <p class="hnote" style="left:884px;top:1560px;font-size:58px;color:#6b3fa8">Patchouli Knowledge</p>
+    <canvas class="abs" data-art="arrow:73:#6b3fa8:1" width="220" height="150" style="left:740px;top:1650px;transform:rotate(-14deg)"></canvas>
+  </section>
+
+  <!-- 4 境界：隙间月影（宣传册编辑排版） -->
+  <section class="panel" data-panel="sukima" id="p-sukima">
+    <div class="sk">
+      <div class="brand"><img src="../assets/img/sukima-avatar.jpg" alt=""><span class="mono en">SUKIMA MOONLIGHT</span><span class="cn">隙间月影</span><span class="mono est">EST. 2025.11 / BEIJING</span></div>
+      <h2>名画与东方的邂逅。</h2>
+      <p class="mono sub">WHERE CLASSIC ART MEETS TOUHOU</p>
+      <p class="quote">如果维米尔生活在幻想乡，他会画谁？</p>
+      <div class="rule" style="top:630px"></div>
+
+      <article class="work">
+        <figure class="art"><img src="../assets/img/art-1-yukari.jpg" alt=""></figure>
+        <div class="orig"><img src="../assets/img/orig-1-vermeer.jpg" alt=""><span class="mono">ORIGINAL</span></div>
+        <div class="info">
+          <p class="mono lab">01 / WORK</p>
+          <h3>戴珍珠耳环的17岁少女</h3>
+          <div class="hr"></div>
+          <dl><dt>原作</dt><dd>维米尔<br>《戴珍珠耳环的少女》</dd><dt>角色</dt><dd>八云紫</dd><dt>画师</dt><dd>真菌_isomer</dd></dl>
+          <div class="hr"></div>
+          <p class="mono lab">OFFERINGS / 供奉规格</p>
+          <table><tr><td>14寸画芯</td><td>¥68</td></tr></table>
+          <p class="note">数字典藏 ¥6.48 · 购买实物版免费附赠数字典藏</p>
+        </div>
+      </article>
+      <article class="work">
+        <figure class="art"><img src="../assets/img/art-2-patchouli.jpg" alt=""></figure>
+        <div class="orig"><img src="../assets/img/orig-2-spitzweg.jpg" alt=""><span class="mono">ORIGINAL</span></div>
+        <div class="info">
+          <p class="mono lab">02 / WORK</p>
+          <h3>不动的大图书馆</h3>
+          <div class="hr"></div>
+          <dl><dt>原作</dt><dd>斯皮茨韦格《书虫》</dd><dt>角色</dt><dd>帕秋莉·诺蕾姬</dd><dt>画师</dt><dd>青未Q</dd></dl>
+          <div class="hr"></div>
+          <p class="mono lab">OFFERINGS / 供奉规格</p>
+          <table><tr><td>16寸画芯（A款）</td><td>¥70</td></tr><tr><td>16寸画芯（B款）</td><td>¥78</td></tr></table>
+          <p class="note">数字典藏 ¥6.48 · 购买实物版免费附赠数字典藏</p>
+        </div>
+      </article>
+      <article class="work">
+        <figure class="art"><img src="../assets/img/art-3-meninas.jpg" alt=""></figure>
+        <div class="orig"><img src="../assets/img/orig-3-velazquez.jpg" alt=""><span class="mono">ORIGINAL</span></div>
+        <div class="info">
+          <p class="mono lab">03 / WORK</p>
+          <h3>蓬莱宫娥</h3>
+          <div class="hr"></div>
+          <dl><dt>原作</dt><dd>委拉斯开兹《宫娥》</dd><dt>角色</dt><dd>蓬莱山辉夜<br>&amp; 永远亭众</dd><dt>画师</dt><dd>amibazh</dd></dl>
+          <div class="hr"></div>
+          <p class="mono lab">OFFERINGS / 供奉规格</p>
+          <table><tr><td>14寸画芯</td><td>¥69</td></tr></table>
+          <p class="note">数字典藏 ¥6.48 · 购买实物版免费附赠数字典藏</p>
+        </div>
+      </article>
+      <article class="work">
+        <figure class="art"><img src="../assets/img/art-4-swing.jpg" alt=""></figure>
+        <div class="orig"><img src="../assets/img/orig-4-fragonard.jpg" alt=""><span class="mono">ORIGINAL</span></div>
+        <div class="info">
+          <p class="mono lab">04 / WORK</p>
+          <h3>妖怪之山的秋千</h3>
+          <div class="hr"></div>
+          <dl><dt>原作</dt><dd>弗拉戈纳尔《秋千》</dd><dt>角色</dt><dd>東風谷早苗<br>&amp; 射命丸文</dd><dt>画师</dt><dd>真菌_isomer</dd></dl>
+          <div class="hr"></div>
+          <p class="mono lab">OFFERINGS / 供奉规格</p>
+          <table><tr><td>14寸画芯</td><td>¥68</td></tr></table>
+          <p class="note">数字典藏 ¥6.48 · 购买实物版免费附赠数字典藏</p>
+        </div>
+      </article>
+
+      <div class="rule" style="top:1580px;height:2px"></div>
+      <div class="foot">
+        <img class="qr" src="../assets/img/qr-sukima.png" alt="">
+        <div>
+          <p class="mono lab">WEBSITE</p>
+          <p class="big m">sukima-ml.club</p>
+          <p class="mono lab">QQ GROUP</p>
+          <p class="big">QQ 群 917948669</p>
+        </div>
+        <p class="mono tail">TOUHOU PROJECT × CLASSIC ART</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 宣符：北交摊宣 Vol.1 -->
+  <section class="panel" data-panel="win" id="p-win">
+    <canvas class="sheet" data-art="manga:23" width="1936" height="1956"></canvas>
+    <div class="m-head"><span class="m-tag">北交摊宣</span><span class="m-vol">Vol.1</span><span class="mono m-en">BEIJING TOUHOUCOMMUNITY</span></div>
+    <h2 class="m-title" style="left:84px;top:300px;font-size:280px">会<span class="inv">赢</span>的</h2>
+    <p class="m-body" style="left:92px;top:720px;font-size:120px">亚克力挂件</p>
+    <p class="m-body" style="left:92px;top:880px;font-size:168px;line-height:1.1">8元/套</p>
+    <canvas class="abs" data-art="ring:82:#e2463c" width="640" height="280" style="left:30px;top:850px;transform:rotate(-3deg)"></canvas>
+    <p class="m-body" style="left:92px;top:1110px;font-size:84px">（包含两个单件）</p>
+    <figure class="photo" style="right:84px;top:250px;width:800px;transform:rotate(2.5deg)"><img src="../assets/img/flyer-vol1.jpg" alt=""><i class="tape pink" style="left:275px;top:-34px;transform:rotate(-4deg)"></i></figure>
+    <div class="bubble" style="left:70px;top:1390px;width:860px;height:300px"><canvas data-art="bubble:101:r" width="860" height="300"></canvas><p>这就是答案。</p></div>
+    <div class="bubble" style="left:780px;top:1560px;width:1040px;height:320px"><canvas data-art="bubble:102:l" width="1040" height="320"></canvas><p>两者皆有可能……</p></div>
+  </section>
+
+  <pre id="dbg" hidden></pre>
+</div>
+
+<script src="../vendor/pixi.min.js"></script>
+<script src="util.js"></script>
+<script src="art.js"></script>
+<script src="cards.js"></script>
+<script src="sim.js"></script>
+<script src="ai.js"></script>
+<script src="input.js"></script>
+<script src="panels.js"></script>
+<script src="render.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
