@@ -98,7 +98,7 @@ function sOmg(c, tau, i) {
   const t = twos(tau), { rail, s, tb, te, snap, laugh } = S6;
   const shake = settle(tau, te, { amp: 9, freq: 6, decay: 9 }), shakeX = settle(tau, snap, { amp: 8, freq: 7, decay: 10 });
   setView({ x: CX + whip(tau, S6.dur, { inn: .45, out: .4, dist: 760 }) + shakeX, y: CY + shake });
-  paperBg(c, K.mustard, { seed: 61 });
+  paperBg(c, '#f3c3a3', { seed: 61 });
   // 卡纸上的小星星和胶带
   [[1830, 150, 20, 1], [1790, 470, 14, 2], [1860, 760, 17, 3], [60, 560, 15, 4], [1060, 560, 13, 5]].forEach(([x, y, r, k]) => star(c, x, y, r, { seed: 60 + k, color: '#fffaf0', rot: drift(t, k) * .2 }));
   // 笑话图：贴在右边，电车刹停时被震得晃一下
