@@ -7,7 +7,7 @@
 //   1.9    四面八方伸进来的手啪啪地贴点，越贴越快；东方夜雀食堂堆成红点山，恋恋的心跳大冒险红黑打架
 //   6.08   最后一下：打架那格红手黑手同时拍下，两张点撞在一起
 //   6.3    停住；一只手踮着脚进来，在红点山顶贴上一个小黑点
-//   7.2    画的表缩到左上，右边拍下实体表照片，左下写两句号召
+//   7.2    画的表缩到左上，右边拍下实体表照片，左下写两句号召；字写完后又有两只手从左边进来，给小表添两个红点
 //   11.2   一张巨大的黑点贴纸扑满画面，最后 0.17 秒只画 handoffBlack，交给第 7 段
 // 排法：左列作品名靠右、右列靠左，贴点的空白留在两侧外边。手从左右和上下伸进来，挡不住中间的字。
 // 屏上文字全部抄自 docs/素材事实.md「东方二创红黑榜」一节。哪格堆山、哪格打架只在 S6.PLAN 里改。
@@ -22,6 +22,7 @@ const S6 = {
     sneak0: 6.3, sneak: 6.8,              // 最后一只手踮着脚进来，6.8 按下
     move0: 7.2, move1: 7.55, photo: 7.4,  // 表缩到左上，实体表照片拍下
     line1: 7.55, line2: 7.9,              // 两句号召
+    late: [9.3, 10.25],                   // 号召写完后，两只手给缩小的表添红点（只从左边来，不挡照片和字）
     black0: 11.2, black1: 11.42, out: 11.43,   // 巨大黑点扑满画面，之后只画 handoffBlack
   },
   R: 15,                                                   // 贴纸半径
@@ -40,7 +41,7 @@ const S6 = {
     { red: 6, black: 1 },                        // 幻想万华镜
     { red: 5, black: 1 },                        // 秘封活动记录
     { fight: 9 },                                // 恋恋的心跳大冒险：红黑打架
-    { red: 6, black: 1 },                        // 色は匂へど散りぬるを
+    { red: 7, black: 0 },                        // 色は匂へど散りぬるを（全红：山顶那张偷贴的黑点才显眼）
     { heap: [11, 10, 9, 8, 7, 5, 4, 2, 1] },     // 东方夜雀食堂：红点山，山顶冒出格子
     { red: 4, black: 2 },                        // 东方冰之勇者记
     { red: 5, black: 5 },                        // 混响男孩：红黑各半
@@ -89,6 +90,8 @@ const S6DOTS = (() => {
   all.forEach(o => { if (o.clash) o.ts = T6.clash; }); all.find(o => o.pre).ts = T6.press;
   const peak = all.filter(o => o.cell === 7).reduce((p, q) => (q.y < p.y ? q : p));
   all.push({ x: peak.x + 2, y: peak.y - R * 1.15, c: 'b', ts: T6.sneak, sneak: true, cell: 7, col: 1, row: 1 });
+  [[1, T6.late[0]], [4, T6.late[1]]].forEach(([row, ts], j) => { const a = s6Cell(0, row).dot, rr = rng(700 + j), [x, y] = pick(rr, [a.x0 + R + 4, a.x1 - R - 4, a.y0 + R + 12, a.y1 - R - 12], (x, y) => near(x, y, R * 2 + 3, all));
+    all.push({ x, y, c: 'r', ts, late: true, cell: row, col: 0, row }); });
   all.sort((p, q) => p.ts - q.ts);
   all.forEach((o, id) => { const rr = rng(900 + id * 7), prog = clamp((o.ts - T6.stick0) / (T6.stick1 - T6.stick0), 0, 1);
     o.id = id; o.s = 1.12 + rr() * .22; o.dv = rr() < .5 ? 1 : -1; o.style = Math.floor(rr() * 4);
@@ -96,11 +99,12 @@ const S6DOTS = (() => {
     let out;
     if (o.pre) { out = PI / 4; o.style = 0; o.s = 1.2; }
     else if (o.sneak) { out = -PI / 2 + .3; o.style = 2; o.s = 1.15; }
+    else if (o.late) { out = PI + (rr() - .5) * .5; o.style = 3; }
     else if (o.clash) { out = o.c === 'r' ? PI - .15 : PI / 2 + .1; o.s = 1.25; o.style = o.c === 'r' ? 0 : 1; }
     else if (o.fight) out = (o.c === 'r' ? PI : PI / 2) + (rr() - .5) * .7;
     else { const q = rr(); out = (o.row === 0 && q < .45) ? -PI / 2 : (o.row === 5 && q < .45) ? PI / 2 : (o.col ? 0 : PI); out += (rr() - .5) * .9; }
     o.ang = out + PI;
-    o.tin = o.pre ? .26 : o.clash ? .18 : lerp(.3, .1, Math.sqrt(prog)); o.tp = o.pre || o.clash ? .1 : o.sneak ? .08 : lerp(.1, .04, prog); o.tout = o.pre || o.clash ? .22 : o.sneak ? .12 : lerp(.24, .1, Math.sqrt(prog)); });
+    o.tin = o.pre || o.late ? .26 : o.clash ? .18 : lerp(.3, .1, Math.sqrt(prog)); o.tp = o.pre || o.clash || o.late ? .1 : o.sneak ? .08 : lerp(.1, .04, prog); o.tout = o.pre || o.clash || o.late ? .22 : o.sneak ? .12 : lerp(.24, .1, Math.sqrt(prog)); });
   return all; })();
 
 // ===================== 画具：贴纸、手 =====================
@@ -154,7 +158,7 @@ function s6Burst(c, x, y, u, sd, big = 1) { if (u < 0 || u >= .17 * big) return;
 // s6Line：一条木刻表格线，从 a 画到 b（p 0..1 画出一部分），中间有几处手抖的起伏
 function s6Line(c, a, b, o = {}) { const { w = 6, p = 1, seed = 1 } = o, dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L, n = Math.max(2, Math.round(L / 120));
   const pts = Array.from({ length: n + 1 }, (_, k) => { const f = k / n, off = k && k < n ? noise1(k * .9, seed) * 1.8 : 0; return [a[0] + dx * f + nx * off, a[1] + dy * f + ny * off]; });
-  stroke(c, pts, { w, p, seed, taper: .01, rough: .32, dry: .015 }); }
+  stroke(c, pts, { w, p, seed, taper: .01, rough: .32 }); }
 // s6Grid：表格线。拉远时从开场那张贴纸的位置往外刻出去，离它越远的线越晚出来
 function s6Grid(c, t) { const g = S6.G, [px, py] = S6.P0, t0 = S6.T.pull0, v = 2600, sd = tick(t);
   const seg = (a, b, w, k) => { const d0 = Math.hypot(a[0] - px, a[1] - py), len = Math.hypot(b[0] - a[0], b[1] - a[1]), s0 = t0 + d0 / v, p = sm(s0, s0 + .08 + len / v, t, easeOut);
