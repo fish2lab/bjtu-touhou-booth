@@ -1,0 +1,108 @@
+<svg id="sukima-logo-full" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="void-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a0404;stop-opacity:1" /> 
+      <stop offset="50%" style="stop-color:#000000;stop-opacity:1" /> 
+      <stop offset="100%" style="stop-color:#2a0000;stop-opacity:1" /> 
+    </linearGradient>
+
+    <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#BF953F;stop-opacity:1" />
+      <stop offset="40%" style="stop-color:#FCF6BA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#AA771C;stop-opacity:1" />
+    </linearGradient>
+
+    <filter id="moonlight-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"/>
+      <feFlood flood-color="#BF953F" flood-opacity="0.4" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="canvas-texture">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.1 0" in="noise" result="coloredNoise"/>
+      <feComposite operator="in" in="coloredNoise" in2="SourceGraphic" result="composite"/>
+      <feBlend mode="multiply" in="composite" in2="SourceGraphic"/>
+    </filter>
+
+    <path id="moon-shape-data"
+      d="M7.3634,42.4095c4.5525,6.1703,11.874,10.1726,20.1303,10.1726c13.8071,0,25-11.1929,25-25 c0-8.5226-4.2646-16.0492-10.7763-20.5621c13.0383,2.8385,22.7812,14.4426,22.7812,28.3317c0,16.0163-12.9837,29-29,29 C21.9109,64.3517,10.5097,55.0229,7.3634,42.4095z"
+    />
+    <clipPath id="moon-mask">
+      <use href="#moon-shape-data" />
+    </clipPath>
+
+    <symbol id="eye-symbol" viewBox="0 0 24 24">
+      <g>
+          <path d="M12 7.5C7.69517 7.5 4.47617 11.0833 3.39473 12.4653C3.14595 12.7832 3.14595 13.2168 3.39473 13.5347C4.47617 14.9167 7.69517 18.5 12 18.5C16.3048 18.5 19.5238 14.9167 20.6053 13.5347C20.8541 13.2168 20.8541 12.7832 20.6053 12.4653C19.5238 11.0833 16.3048 7.5 12 7.5Z" 
+                fill="#FFFFFF" stroke="#000000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="12" cy="13" r="2.5" fill="#000000" />
+      </g>
+    </symbol>
+
+    <g id="bow-tie">
+      <path d="M0,0 C-3,-4 -6,-2 -6,1 C-6,5 -2,4 0,0 Z" fill="#b71c1c" />
+      <path d="M0,0 C3,-4 6,-2 6,1 C6,5 2,4 0,0 Z" fill="#b71c1c" />
+      <path d="M0,0 Q-2,6 -4,8" stroke="#b71c1c" stroke-width="1" fill="none" stroke-linecap="round" />
+      <path d="M0,0 Q2,6 4,8" stroke="#b71c1c" stroke-width="1" fill="none" stroke-linecap="round" />
+      <circle cx="0" cy="0" r="1" fill="#8b0000" />
+    </g>
+    
+    <g id="full-moon-icon">
+        <use href="#moon-shape-data" fill="url(#void-gradient)" />
+        <g clip-path="url(#moon-mask)">
+            <g transform="scale(0.225)">
+            <use href="#eye-symbol" x="0" y="20" /> <use href="#eye-symbol" x="120" y="20" /> <use href="#eye-symbol" x="240" y="20" />
+            <use href="#eye-symbol" x="60" y="84" /> <use href="#eye-symbol" x="180" y="84" /> <use href="#eye-symbol" x="300" y="84" />
+            <use href="#eye-symbol" x="0" y="148" /> <use href="#eye-symbol" x="120" y="148" /> <use href="#eye-symbol" x="240" y="148" />
+            <use href="#eye-symbol" x="60" y="212" /> <use href="#eye-symbol" x="180" y="212" /> <use href="#eye-symbol" x="300" y="212" />
+            <use href="#eye-symbol" x="0" y="276" /> <use href="#eye-symbol" x="120" y="276" /> <use href="#eye-symbol" x="240" y="276" />
+            <use href="#eye-symbol" x="60" y="340" /> <use href="#eye-symbol" x="180" y="340" />
+            </g>
+        </g>
+        <use href="#moon-shape-data" fill="black" filter="url(#canvas-texture)" opacity="0.3"/>
+        <use href="#moon-shape-data" fill="none" stroke="url(#gold-gradient)" stroke-width="0.5" />
+        <use href="#bow-tie" x="56.1" y="4.12" transform="rotate(-30 56.1 4.12) scale(0.8)" />
+        <use href="#bow-tie" x="3.8" y="42.4" transform="rotate(135 3.8 42.4) scale(0.8)" />
+    </g>
+  </defs>
+
+  <g transform="translate(7.5, 25)" filter="url(#moonlight-glow)"> 
+    <use href="#full-moon-icon" />
+  </g>
+
+  <g transform="translate(72.5, 55)"> 
+    
+    <text x="0" y="10" 
+          font-family="'Songti SC', serif" 
+          font-weight="bold" 
+          font-size="24" 
+          fill="#AA771C"
+          letter-spacing="2">
+      隙間月影
+    </text>
+    
+    <text x="-3.4" y="32" 
+          font-family="'Courier New', Courier, monospace" 
+          font-size="8" 
+          fill="#AA771C" 
+          letter-spacing="0.5"
+          style="text-transform: lowercase;">
+      https://sukima-ml.club/
+    </text>
+
+    <line x1="-3.4" y1="42" x2="113.3" y2="42" stroke="url(#gold-gradient)" stroke-width="0.5" />
+    
+    <text x="-3.4" y="50" 
+          font-family="'Georgia', serif" 
+          font-size="5" 
+          fill="#555" 
+          font-style="italic">
+      Where Classic Art Meets Touhou
+    </text>
+  </g>
+</svg>

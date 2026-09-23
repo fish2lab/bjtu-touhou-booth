@@ -1,0 +1,17 @@
+{
+  "name": "bx-booth-screen",
+  "private": true,
+  "version": "0.1.0",
+  "description": "北交摊位 4K 展示屏：轮播动画与弹幕游戏 POC",
+  "scripts": {
+    "vendor": "node scripts/vendor.mjs",
+    "shot": "node scripts/shot.mjs"
+  },
+  "dependencies": {
+    "gsap": "^3.15.0",
+    "pixi.js": "^8.21.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

@@ -1,0 +1,5 @@
+node_modules/
+.venv/
+.claude/worktrees/
+out/
+.DS_Store
