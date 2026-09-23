@@ -14,7 +14,8 @@ const K = {
   rose: '#8a3a3d',                    // 1 三眼的幻恋：唯一的一朵蔷薇
   plum: '#4B2A63',                    // 2 隙间月影：引言紫（宣传册原色）
   teal: '#5b776e', ochre: '#a4894f',  // 3 炼金工坊：双色油印
-  vermil: '#9c4637',                  // 4 雏祭：缎带
+  vermil: '#9c4637', moss: '#6e7a5a',  // 4 雏祭：红、绿和纸（活动材料就是红绿两色和纸），雏的缎带用 vermil
+  dot: '#a8403a',                     // 6 红黑榜：小红点贴纸
   stamp: '#a3342c',                   // 7 笑话集：WASTED 印泥
 };
 
@@ -152,10 +153,18 @@ function zhWidth(c, str, size, font = ZH, weight = 400) { c.save(); c.font = `${
 // printText：印刷体（隙间月影、笑话正文）：不抖、不倾斜。spacing 是字距（像素）
 function printText(c, str, x, y, o = {}) { const { size = 40, color = K.ink, font = 'NSans', weight = 400, align = 'left', al = 1, spacing = 0 } = o; if (al <= 0) return; c.save(); c.globalAlpha *= al; c.font = `${weight} ${size}px ${font}`; c.fillStyle = color; c.textAlign = align; c.textBaseline = 'alphabetic'; if (spacing) c.letterSpacing = `${spacing}px`; c.fillText(str, x, y); c.restore(); }
 // wrapText：按宽度 maxW 把一段印刷体折成多行（中文逐字折，不拆英文单词）
-function wrapText(c, str, maxW, size, font = 'NSans', weight = 400) { c.save(); c.font = `${weight} ${size}px ${font}`; const out = [];
+//   句末标点（，。、？！」’”）…）不放到行首：挤进上一行
+function wrapText(c, str, maxW, size, font = 'NSans', weight = 400) { c.save(); c.font = `${weight} ${size}px ${font}`; const out = [], tail = '，。、？！」’”）…：；,.!?)';
   for (const para of String(str).split('\n')) { const tokens = para.match(/[A-Za-z0-9.@_\-]+|\s+|./gu) || ['']; let line = '';
-    for (const tk of tokens) { if (c.measureText(line + tk).width > maxW && line.trim()) { out.push(line.trimEnd()); line = tk.trimStart(); } else line += tk; } out.push(line); }
+    for (const tk of tokens) { if (c.measureText(line + tk).width > maxW && line.trim() && !tail.includes(tk)) { out.push(line.trimEnd()); line = tk.trimStart(); } else line += tk; } out.push(line); }
   c.restore(); return out; }
+
+// img：画一张素材照片（photos.js 里的名字），铺满 (x, y, w, h) 的框，多出来的一边居中裁掉；缩小时用高质量平滑，不起锯齿
+function img(c, name, x, y, w, h, o = {}) { const { al = 1, fit = 'cover' } = o, ph = PHOTOS[name]; if (!ph) throw new Error('unknown photo: ' + name); if (al <= 0) return;
+  let sx = 0, sy = 0, sw = ph.w, sh = ph.h; const ar = w / h, sar = ph.w / ph.h;
+  if (fit === 'cover') { if (sar > ar) { sw = ph.h * ar; sx = (ph.w - sw) / 2; } else { sh = ph.w / ar; sy = (ph.h - sh) / 2; } }
+  else if (sar > ar) { const hh = w / sar; y += (h - hh) / 2; h = hh; } else { const ww = h * sar; x += (w - ww) / 2; w = ww; }
+  c.save(); c.globalAlpha *= al; c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high'; c.drawImage(ph.img, sx, sy, sw, sh, x, y, w, h); c.restore(); return [x, y, w, h]; }
 
 // ===================== 展签字幕与画框 =====================
 // caption：左上角的展签小字幕（参考视频的「day 0」）：白底黑框，手写字逐字打出。画在屏幕坐标里，与镜头无关。
@@ -191,8 +200,11 @@ function eyeLines(c, x, y, r, o = {}) { const { lid = 1, open = 0, look = [0, 0]
 //   handoffBlack    纯墨底：2→3、4→5、6→7、7→1（循环回开头）
 //   handoffSukima   隙间月影的纸 #F7F6F4：1→2（三眼的隙间裂开后满屏是这张纸）
 //   handoffStream   暖白纸上一条横贯画面的灰墨小溪线：3→4（魔药倒出来流成小溪，雏祭从这条线开始）
+//   handoffDot      暖白纸正中一个黑色圆点（半径 DOT_R）：5→6（会赢的收成一个黑点，红黑榜把它当第一张黑点贴纸）
 const SUKIMA_PAPER = '#F7F6F4';
 const STREAM = Array.from({ length: 49 }, (_, k) => [-40 + k * 42, 640 + 16 * Math.sin(k * .55) + 8 * Math.sin(k * 1.3 + 1)]);
 function handoffBlack(c) { setView(null); inkBg(c); }
 function handoffSukima(c) { setView(null); resetT(c); c.fillStyle = SUKIMA_PAPER; c.fillRect(-10, -10, W + 20, H + 20); texture(c, null, 'paper', .35); }
 function handoffStream(c) { setView(null); paperBg(c); stroke(c, STREAM, { w: 10, color: K.g3, seed: 5, taper: 0, rough: .25 }); }
+const DOT_R = 34;
+function handoffDot(c) { setView(null); paperBg(c); block(c, ellPts(CX, CY, DOT_R, DOT_R, 0, 40), K.ink, { amp: 1.2, seed: 7, grain: .4 }); }

@@ -36,6 +36,8 @@ PHOTOS = [
     ("avatar", "sukima-avatar.jpg", 512, "隙间月影品牌头像"),
     ("sanyanInk", "sanyan-cover-ink.jpg", 1600, "三眼的幻恋封面 · 水墨版（用户提供）"),
     ("sanyanColor", "sanyan-cover-color.jpg", 1600, "三眼的幻恋封面 · 彩色版（用户提供）"),
+    ("hinaFlyer", "flyer-vol2-hina.jpg", 1920, "雏祭摊宣 Vol.2（新版，用户提供）"),
+    ("board", "redblack-board.jpg", 2400, "东方二创红黑榜实体表（用户提供）"),
     ("bottle1", "bottle-1.jpg", 640, "雏祭漂流瓶头像 1（用户提供）"),
     ("bottle2", "bottle-2.jpg", 640, "雏祭漂流瓶头像 2（用户提供）"),
     ("bottle3", "bottle-3.jpg", 640, "雏祭漂流瓶头像 3（用户提供）"),
