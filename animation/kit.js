@@ -272,27 +272,30 @@ const TR = { body: '#f7edd3', band: '#3a67bf', roof: '#b4abcc', glass: '#cfe6f4'
 //   o.seats[k](c, x, y, s)  第 k 个车窗里的乘客：脚底 (x, y)、头半径 s 的 headOnly chibi，头正好落在窗里  o.driver 同上，驾驶窗
 //   o.umbrella {blink, tongue} 小伞在驾驶座时从车顶撑出来的伞  o.roll 车轮转角  o.pole 受电弓升起 0..1  o.board 目的地牌  o.doorOpen 0..1
 function tram(c, x, y, s, o = {}) {
-  const { roll = 0, board = '北京交通大学', boardP = 1, pole = 1, seats = [], driver = null, umbrella = null, lamp = 0, seed = 40, rot = 0, name = true, al = 1, doorOpen = 0 } = o;
+  const { roll = 0, board = '北京交通大学', boardP = 1, boardFrom = null, flip = 1, pole = 1, seats = [], driver = null, umbrella = null, lamp = 0, seed = 40, rot = 0, name = true, al = 1, doorOpen = 0, glass = TR.glass } = o;
   const T = tf(x, y, s, rot), lw = Math.max(2.5, s * .045), rim = clamp(s * .05, 3, 7), P = pts => M(T, pts);
   const part = (pts, col, q = {}) => cut(c, P(pts), col, { rim, seed: seed + (q.k || 0), anchor: T(0, 0), smooth: false, shadow: .14, ...q });
   c.save(); c.globalAlpha *= al;
   const pz = -2.36 - 1.0 * pole;   // 受电弓
-  inkLine(c, P([[-2.35, -2.36], [-1.75, (pz - 2.36) / 2], [-2.12, pz]]), lw * 1.2, K.ink, { smooth: false }); inkLine(c, P([[-2.5, pz], [-1.72, pz]]), lw * 1.4, K.ink, { smooth: false });
+  const pm = (pz - 2.36) / 2; inkLine(c, P([[-2.0, -2.3], [-2.34, pm], [-2.0, pz], [-1.66, pm], [-2.0, -2.3]]), lw * 1.1, K.ink, { smooth: false }); inkLine(c, P([[-2.42, pz], [-1.58, pz]]), lw * 1.5, K.ink, { smooth: false });
+  fillPts(c, P([[-2.14, -2.36], [-1.86, -2.36], [-1.9, -2.46], [-2.1, -2.46]]), '#4a435c');
   if (umbrella) umbrellaK(c, T(2.05, -3.55), T(2.3, -2.3), s * .95, umbrella);
   part([[-2.95, -2.12], [-2.72, -2.36], [2.42, -2.36], [2.84, -2.1], [2.84, -1.98], [-2.95, -1.98]], TR.roof, { k: 1 });
   part([[-3, -2.06], [2.74, -2.06], [2.96, -1.74], [3.03, -1.1], [3.03, -.6], [-3, -.6]], TR.body, { k: 2 });
   part([[-3, -1.08], [3.03, -1.08], [3.03, -.6], [-3, -.6]], TR.band, { k: 3, rim: 0, shadow: 0 });
   inkLine(c, P([[-3, -1.2], [3.0, -1.2]]), lw * .9, TR.band, { smooth: false });
-  [[-2.62, -1.72], [-1.5, -.6], [-.38, .52]].forEach(([a, b], k) => { const wp = part([[a, -1.92], [b, -1.92], [b, -1.3], [a, -1.3]], TR.glass, { k: 5 + k, rim: 0, shadow: 0, tex: .3, jag: .4 });
+  [[-2.62, -1.72], [-1.5, -.6], [-.38, .52]].forEach(([a, b], k) => { const wp = part([[a, -1.92], [b, -1.92], [b, -1.3], [a, -1.3]], glass, { k: 5 + k, rim: 0, shadow: 0, tex: .3, jag: .4 });
     if (seats[k]) { c.save(); c.clip(wp); const [cx, cy] = T((a + b) / 2, -1.58), ss = s * .3; seats[k](c, cx, cy + 2.3 * ss, ss); c.restore(); }
     inkLine(c, P([[a + .1, -1.84], [a + .32, -1.84]]), lw * .8, 'rgba(255,255,255,.8)', { smooth: false }); });
   part([[.72, -1.96], [1.42, -1.96], [1.42, -.62], [.72, -.62]], doorOpen > 0 ? '#5a5070' : TR.door, { k: 9, rim: 0, shadow: .1 });
   if (doorOpen < 1) part([[.72 + .7 * doorOpen, -1.96], [1.42, -1.96], [1.42, -.62], [.72 + .7 * doorOpen, -.62]], TR.door, { k: 10, rim: 0, shadow: .12 });
-  const cp = part([[1.95, -1.94], [2.7, -1.94], [2.9, -1.64], [2.95, -1.3], [1.95, -1.3]], TR.glass, { k: 11, rim: 0, shadow: 0, tex: .3, jag: .4 });
+  const cp = part([[1.95, -1.94], [2.7, -1.94], [2.9, -1.64], [2.95, -1.3], [1.95, -1.3]], glass, { k: 11, rim: 0, shadow: 0, tex: .3, jag: .4 });
   if (driver) { c.save(); c.clip(cp); const [cx, cy] = T(2.4, -1.58), ss = s * .3; driver(c, cx, cy + 2.3 * ss, ss); c.restore(); }
-  part([[-1.02, -2.95], [1.02, -2.95], [1.02, -2.4], [-1.02, -2.4]], TR.board, { k: 12, rim: 0, shadow: .16, tex: .15 });
+  // 目的地牌：boardFrom 给出时，flip 0→1 让牌子上下翻一圈，从 boardFrom 翻成 board
+  const fk = boardFrom ? Math.abs(Math.cos(Math.PI * clamp(flip, 0, 1))) : 1, bText = boardFrom && flip < .5 ? boardFrom : board, bv = v => -2.675 + (v + 2.675) * Math.max(.02, fk);
+  part([[-1.02, bv(-2.95)], [1.02, bv(-2.95)], [1.02, bv(-2.4)], [-1.02, bv(-2.4)]], TR.board, { k: 12, rim: 0, shadow: .16, tex: .15 });
   inkLine(c, P([[-.7, -2.4], [-.7, -2.36]]), lw, K.ink, { smooth: false }); inkLine(c, P([[.7, -2.4], [.7, -2.36]]), lw, K.ink, { smooth: false });
-  const [bx, by] = T(0, -2.55); zh(c, board, bx, by, { size: s * .36, align: 'center', color: '#1e2b63', p: boardP, rot, tilt: .02, jitter: .01, seed: 9 });
+  const [bx, by] = T(0, -2.675), bsz = s * Math.min(.36, 1.8 / [...bText].length); c.save(); c.translate(bx, by); c.rotate(rot); c.scale(1, Math.max(.02, fk)); zh(c, bText, 0, bsz * .36, { size: bsz, align: 'center', color: '#1e2b63', p: boardP, tilt: .02, jitter: .01, seed: 9 }); c.restore();
   if (name) { const [nx, ny] = T(-2.8, -.72); zh(c, '幻想乡交通大学号', nx, ny, { size: s * .27, color: '#fffaf0', rot, tilt: .03, jitter: .02, seed: 5 }); }
   const [ex, ey] = T(.1, -.84); cut(c, ellPts(ex, ey, s * .17, s * .17, 0, 18), '#ffffff', { rim: 0, seed: seed + 13, shadow: .1, tex: .1 }); inkLine(c, ellPts(ex, ey, s * .12, s * .12, 0, 18), lw * .6, TR.band, { close: true, smooth: false });
   const [lx, ly] = T(2.96, -.86); cut(c, ellPts(lx, ly, s * .13, s * .13, 0, 14), TR.lamp, { rim: 0, seed: seed + 14, shadow: .1 });
