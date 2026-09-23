@@ -26,7 +26,7 @@ const chunk = Math.ceil(N / jobs), parts = [];
 await Promise.all(Array.from({ length: jobs }, async (_, j) => {
   const a = j * chunk, b = Math.min(N, a + chunk); if (a >= b) return; const file = path.join(tmp, `part${j}.mp4`); parts[j] = file;
   const { page, errors } = j === 0 ? first : await open();
-  const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'mjpeg', '-i', '-', '-c:v', 'libx264', '-preset', 'medium', '-crf', crf, '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-r', String(fps), file], { stdio: ['pipe', 'inherit', 'inherit'] });
+  const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'mjpeg', '-i', '-', '-vf', 'scale=in_range=pc:out_range=tv,format=yuv420p', '-color_range', 'tv', '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-c:v', 'libx264', '-preset', 'medium', '-crf', crf, '-profile:v', 'high', '-level:v', '5.1', '-r', String(fps), file], { stdio: ['pipe', 'inherit', 'inherit'] });
   const closed = new Promise((res, rej) => ff.on('close', code => code ? rej(new Error('ffmpeg exit ' + code)) : res()));
   for (let i = a; i < b; i++) {
     const data = await page.evaluate(i => { window.__drawFrame(i); return cv.toDataURL('image/jpeg', .95); }, i);
