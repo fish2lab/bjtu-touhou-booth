@@ -93,7 +93,7 @@ function sSanyan(c, tau, i) {
   if (t > go) motionLinesAt(c, X - 3.25 * s, rail - 1.7 * s, sm(go, go + .6, t) * .6);
   const cast = s7Cast(t, i), tr = tram(c, X, rail, s, { rot: pitch, roll: X / (s * .33), lamp: V > 50 ? 1 : 0, umbrella: cast.umbrella, driver: cast.driver, seats: cast.seats });
   // 红线：A 段（图边 → 心的底尖）、心形一圈、B 段（底尖 → 受电弓）。心像气球：静止时轻轻晃，电车开走时往后飘。
-  const panto = tr.T(-2.11, -3.36), u4 = t - grow1;
+  const panto = tr.T(-2.0, -3.36), u4 = t - grow1;
   const phi = (u4 > 0 ? .06 * Math.sin(u4 * 2.4) : 0) - (t > go ? Math.min(.5, 270 * (t - go) * .0014) + .08 * settle(t, go, { amp: 1, freq: 1.2, decay: 2 }) : 0);
   const Ls = S7.str + (u4 > 0 ? 5 * Math.sin(u4 * 3.1) : 0), tip = [panto[0] + Math.sin(phi) * Ls, panto[1] - Math.cos(phi) * Ls];
   const heartPts = s7HeartLoop(tip, hs * (1 + .07 * settle(t, grow1, { amp: 1, freq: 2.2, decay: 4.5, phase: Math.PI / 2 })), phi * .75), sag = 14 + (t > go ? 10 : 0);
