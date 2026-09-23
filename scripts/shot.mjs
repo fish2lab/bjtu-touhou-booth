@@ -27,6 +27,7 @@ await page.screenshot({ path: out });
 await browser.close();
 console.log(`${out}  ${width}x${height}  ${url}`);
 if (errors.length) {
-  console.log(errors.join('\n'));
+  const uniq = [...new Set(errors)];
+  console.log(`${errors.length} errors, ${uniq.length} unique:\n` + uniq.slice(0, 10).join('\n'));
   process.exitCode = 1;
 }
