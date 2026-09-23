@@ -1,0 +1,2 @@
+ae00fad326ecfe81a064eeb2a198544e53c24654 Wed Sep 23 04:26:22 2026 -0400
+https://github.com/IshaanKalra2103/creative-skills/tree/main/skills/hand-drawn-canvas-animation (MIT, Alexey Fateev)
