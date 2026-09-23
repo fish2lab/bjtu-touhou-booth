@@ -1,5 +1,5 @@
 'use strict';
-// 第 7 段 北交东方笑话集 发布（约 20.9 秒）。照 WASTED 方框印章 meme 的排布：四则笑话一则比一则好笑，
+// 第 7 段 北交东方笑话集 发布（约 21 秒）。照 WASTED 方框印章 meme 的排布：四则笑话一则比一则好笑，
 // 新的一则从右边进来，旧的一则同时退到左边、被盖上方框 WASTED 章、变灰变暗，下一则进来时被推出画面；
 // 第四则单独停住 2.5 秒后也被盖章。然后聚光灯下亮出最好笑的一则（八云紫的用户资料卡，不盖章），
 // 最后觉之瞳慢慢睁开，对着观众写出「你刚才在脑袋里笑了」，落款后黑场，循环回第 1 段。
@@ -7,24 +7,24 @@
 // 屏上文字只来自 animation/data/jokes.js（逐字）和 docs/素材事实.md（「北交东方笑话集 发布」「北京交通大学」）。
 //   0      只画 handoffBlack，接第 6 段
 //   0.2    第 1 则从右边进来，停在正中
-//   2.15   第 2 则进来，第 1 则退到左边、被盖章
-//   4.85   第 3 则进来，第 1 则被推出，第 2 则退到左边、被盖章
-//   8.05   第 4 则进来，第 3 则退到左边、被盖章
-//   9.35   第 3 则被推出，第 4 则移到正中，单独停住 2.5 秒
-//   12.3   恋的手伸进来，第 4 则被盖章，她的帽子和闭着的第三只眼从画面下沿露出来
-//   13.3   一格黑场后聚光灯亮：八云紫的用户资料卡
-//   18.5   觉之瞳睁开，片尾
-//   20.85  只画 handoffBlack
+//   2.4    第 2 则进来，第 1 则退到左边，2.9 被盖章
+//   5.1    第 3 则进来，第 1 则被推出，第 2 则退到左边，5.6 被盖章
+//   8.3    第 4 则进来，第 3 则退到左边，8.8 被盖章
+//   9.5    第 3 则被推出，第 4 则移到正中，单独停住 2.5 秒
+//   12.34  恋的手伸进来，12.79 第 4 则被盖章，她的帽子和闭着的第三只眼从画面下沿露出来
+//   13.29  一格黑场后聚光灯亮：八云紫的用户资料卡
+//   18.59  觉之瞳睁开，片尾
+//   20.94  只画 handoffBlack（段长 21.06 秒）
 
 const S7 = {
   P: 800, Y: 588, XL: 500, XR: 1420, XC: 960, OFFR: 2340, OFFL: -420,   // 方形面板边长、中心高度；左、右、正中三个位置，右边外、左边外
   MOVE: .34, PAD: 50, TW: 700,                                              // 面板移动一格的秒数；面板内边距、正文宽
-  IN0: .2, T1: 2.15, T2: 4.85, T3: 8.05, T4: 9.35, HOLD: 2.5,               // 进场、三次换人、第 4 则移到正中；单独停住的秒数
-  IMP: { w: 520, h: 190 },                                                  // 印面（方框）大小
+  IN0: .2, T1: 2.4, T2: 5.1, T3: 8.3, T4: 9.5, HOLD: 2.5,                 // 进场、三次换人、第 4 则移到正中；单独停住的秒数
+  IMP: { w: 520, h: 190 }, IMPY: 232,                                       // 印面（方框）大小；印落在面板中心往下多少（盖在剪影上，不挡包袱）
 };
 S7.HIT4 = S7.T4 + S7.MOVE + S7.HOLD + .45;   // 停够 2.5 秒后手才伸进来，0.45 秒后落章
-S7.C0 = S7.HIT4 + .55;                       // 冠军
-S7.O0 = S7.C0 + 5.2;                         // 片尾
+S7.C0 = S7.HIT4 + .5;                        // 冠军
+S7.O0 = S7.C0 + 5.3;                         // 片尾
 S7.OUT = S7.O0 + 2.35;                       // 只画 handoffBlack
 S7.END = S7.OUT + .12;
 // 每块面板的行程：[开始时刻, 从 x, 到 x]。像传送带，新的一则进来就把整排往左推一格
@@ -39,7 +39,7 @@ S7.STAMPS = [
   { t: S7.T1 + .5, x: S7.XL, arm: -1.2, rot: -.17 },
   { t: S7.T2 + .5, x: S7.XL, arm: 2.2, rot: -.19 },
   { t: S7.T3 + .5, x: S7.XL, arm: Math.PI - .1, rot: -.16 },
-  { t: S7.HIT4, x: S7.XC, arm: .72, rot: -.175 },
+  { t: S7.HIT4, x: S7.XC, arm: 1.0, rot: -.175 },
 ];
 // 每则的排字和配角。punch 从第几行起是包袱；ss / ps 铺垫和包袱的字号；beat 面板落定后隔多久写包袱；per 包袱每字秒数；gap 包袱行之间的停顿
 // fig(c, 面板左上 x, y, 本段秒数, 落定时刻)：面板底部的木刻剪影
@@ -55,10 +55,10 @@ S7.ANON = JOKE_CHAMPION.lines[3].text;
 S7.ANON_H = [...S7.ANON.slice(0, S7.ANON.indexOf('“') + 1)].length;   // 名字到左引号：一下子出现
 S7.ANON_Z = [...S7.ANON.slice(0, S7.ANON.indexOf('紫') + 1)].length;  // 打到「紫」为止：一个字一个字打
 S7.ANON_N = [...S7.ANON].length;
-S7.CH = { on: .12, name: .25, reg: .55, rule: .95, nitori: 1.15, anon: 1.95, slow: .13, pause: .16, fast: .016 };   // 相对冠军开始的秒数
+S7.CH = { on: .1, name: .18, reg: .4, rule: .7, nitori: .85, anon: 1.55, slow: .12, pause: .14, fast: .014 };   // 相对冠军开始的秒数
 S7.CH.mash = S7.CH.anon + .15 + (S7.ANON_Z - S7.ANON_H) * S7.CH.slow + S7.CH.pause;   // 脸滚键盘开始
 S7.CH.note = S7.CH.mash + (S7.ANON_N - S7.ANON_Z) * S7.CH.fast + .1;
-S7.CH.gap = S7.CH.note + .3;                                                           // 隙间张开
+S7.CH.gap = S7.CH.note + .22;                                                          // 隙间张开
 S7.CH.gone = S7.CH.gap + .62;                                                          // 「该用户已注销」
 
 // ===================== 小工具 =====================
@@ -71,10 +71,12 @@ function s7Taper(pts, w0, w1) { const q = spline(pts, 4, false), n = q.length, L
 // s7Ink：局部坐标里的一块木刻墨块；s7W：一道白色刮痕。T 是 tf() 返回的变换
 const s7Ink = (c, T, pts, seed, o = {}) => block(c, M(T, pts), K.ink, { amp: .9, freq: 9, seed, grain: .35, smooth: false, ...o });
 const s7W = (c, T, pts, seed, w = 2.2, o = {}) => scratch(c, M(T, pts), { w, seed, dry: .08, taper: .4, ...o });
-// s7Wrap：手写楷体折行，左引号不留在行尾
-function s7Wrap(c, str, w, size, weight) { const rows = wrapText(c, str, w, size, ZH, weight);
-  for (let k = 0; k < rows.length - 1; k++) if (rows[k].endsWith('“')) { rows[k] = rows[k].slice(0, -1); rows[k + 1] = '“' + rows[k + 1]; }
-  return rows; }
+// s7Wrap：手写楷体折行（kit 的 wrapText）。左引号不留在行尾；7 字以内的短引语（如「不灵不要钱」）被拆开时，整句挪到下一行再往后折
+function s7Wrap(c, str, w, size, weight) { let rows = wrapText(c, str, w, size, ZH, weight);
+  for (let k = 0; k < rows.length - 1; k++) { const i = rows[k].lastIndexOf('“'); if (i < 0 || rows[k].indexOf('”', i) >= 0) continue;
+    const tail = rows[k].slice(i), close = rows[k + 1].indexOf('”');
+    if (tail === '“' || (i > 0 && close >= 0 && !/\s/.test(str) && [...tail].length + close <= 7)) rows = [...rows.slice(0, k), rows[k].slice(0, i), ...wrapText(c, tail + rows.slice(k + 1).join(''), w, size, ZH, weight)]; }
+  return rows.filter(r => r.length); }
 
 // ===================== 面板：暖白卡纸、粗糙黑框、手写正文、木刻剪影 =====================
 // s7Layout：一则笑话折好的行。rows[k] = { text, y（相对正文顶的基线）, size, punch, line（jokes.js 里第几行）, c0（在该行里从第几个字起）, n }
@@ -94,14 +96,14 @@ function s7X(j, tau) { const legs = S7.LEGS[j]; if (tau < legs[0][0]) return nul
   return x < -S7.P / 2 - 30 || x > W + S7.P / 2 + 30 ? null : x; }
 function s7Panel(c, j, x, tau) { const P = S7.P, y = S7.Y, x0 = x - P / 2, y0 = y - P / 2, t = twos(tau), sd = 700 + j * 50 + tick(t, 6);
   const path = block(c, rectPts(x0, y0, P, P), K.paper, { smooth: false, amp: 1.8, freq: 26, seed: sd, grain: .9, anchor: [x0, y0] });
-  outline(c, rectPts(x0 + 16, y0 + 16, P - 32, P - 32), { w: 11, color: K.ink, smooth: false, rough: .35, dry: .05, seed: sd + 1 });
+  outline(c, rectPts(x0 + 16, y0 + 16, P - 32, P - 32), { w: 11, color: K.ink, smooth: false, rough: .35, seed: sd + 1 });
   const L = s7Layout(c, j), ty = y0 + S7.PAD + 14;
   L.rows.forEach((r, k) => { const lp = s7LineP(j, r.line, tau), N = [...JOKES[j].lines[r.line].text].length, p = clamp((lp * N - r.c0) / r.n, 0, 1);
     zh(c, r.text, x0 + S7.PAD, ty + r.y, { size: r.size, weight: r.wt, color: r.punch ? K.ink : K.g3, p, seed: 30 + j * 20 + k, tilt: .01, jitter: .01 }); });
   S7.J[j].fig(c, x0, y0, tau, s7Land(j));
   // 盖过章：整块变灰变暗（像 GTA 的 wasted），章是唯一的颜色
   const st = S7.STAMPS[j], g = sm(st.t, st.t + .14, tau, easeOut);
-  if (g > 0) { c.save(); c.globalAlpha *= .42 * g; c.fillStyle = K.ink; c.fill(path); c.restore(); s7Imprint(c, j, x, y + 12, tau); } }
+  if (g > 0) { c.save(); c.globalAlpha *= .42 * g; c.fillStyle = K.ink; c.fill(path); c.restore(); s7Imprint(c, j, x, y + S7.IMPY, tau); } }
 // s7Speed：面板移动时，右沿后面拖几道白色刮痕速度线
 function s7Speed(c, j, tau, x) { const x1 = s7X(j, tau - 1 / 24); if (x1 === null) return; const v = x1 - x; if (v < 14) return;
   for (let k = 0; k < 3; k++) { const yy = S7.Y - 230 + k * 230 + (k === 1 ? 40 : 0), L = v * (2.2 + k * .6); scratch(c, [[x + S7.P / 2 + 30, yy], [x + S7.P / 2 + 30 + L, yy + 3]], { w: 3, seed: 740 + j * 3 + k, al: .8, dry: .3 }); } }
@@ -147,7 +149,7 @@ function s7Hand(c, x, y, z, ang, sd) { const T = tf(x, y, z, ang), wl = (pts, k,
 }
 // s7Stamp：一次盖章。手从边缘伸进来 → 抬一下 → 砸下去（压扁回弹、画面一震）→ 抬起来撤走，露出印
 function s7Stamp(c, st, tau) { const u = tau - st.t; if (u < -.5 || u > .56) return;
-  const tx = st.x, ty = S7.Y + 12, dx = Math.cos(st.arm), dy = Math.sin(st.arm), bw = S7.IMP.w + 50, bh = S7.IMP.h + 46;
+  const tx = st.x, ty = S7.Y + S7.IMPY, dx = Math.cos(st.arm), dy = Math.sin(st.arm), bw = S7.IMP.w + 50, bh = S7.IMP.h + 46;
   const d = 1250 * (1 - sm(-.5, -.24, u, easeOutQuint)) + 1250 * sm(.16, .52, u, easeIn);
   const z = u < -.2 ? 1.28 : u < -.1 ? lerp(1.28, 1.4, easeOut((u + .2) / .1)) : u < 0 ? lerp(1.4, 1, easeIn((u + .1) / .1)) : 1 + .34 * sm(.06, .3, u, easeOut);
   const q = settle(tau, st.t, { amp: .12, freq: 6, decay: 14, phase: Math.PI / 2 }), x = tx + dx * d, y = ty + dy * d, sd = 800 + S7.STAMPS.indexOf(st) * 40 + tick(twos(tau), 8);
@@ -168,36 +170,40 @@ function s7Stamp(c, st, tau) { const u = tau - st.t; if (u < -.5 || u > .56) ret
 
 // ===================== 恋：第四次盖章时露出来的帽子和闭着的第三只眼 =====================
 function s7Koishi(c, tau) { const st = S7.STAMPS[3], t = twos(tau), rise = easeOutBack(sm(st.t - .32, st.t - .06, t, x => x), 1.2); if (rise <= 0) return;
-  const sd = 860 + tick(t, 8), T = tf(1660, H + 96 - rise * 170, 1, -.08), wl = (pts, k, w = 3, o = {}) => s7W(c, T, pts, sd + k, w, o);
+  const sd = 860 + tick(t, 8), T = tf(1580, H + 96 - rise * 190, 1, -.08), wl = (pts, k, w = 3, o = {}) => s7W(c, T, pts, sd + k, w, o);
+  // 闭着的第三只眼：墨块、白色刮痕描边、只有眼皮线和睫毛。两根管线从帽檐底下（她身上）伸出来，先画，帽檐挡住一截
+  const [ex, ey] = [1802, H - 150 + (1 - rise) * 250];
+  scratch(c, [[ex - 30, ey + 26], [ex - 70, ey + 60], [ex - 120, ey + 96], [ex - 150, ey + 150]], { w: 3, seed: sd + 9, taper: .1 });
+  scratch(c, [[ex + 20, ey + 36], [ex + 42, ey + 80], [ex + 18, ey + 118], [ex + 36, ey + 170]], { w: 3, seed: sd + 13, taper: .1 });
+  const eye = rough(ellPts(ex, ey, 44, 41, .2, 40), { amp: 1.8, freq: 10, seed: sd + 10 });
+  fillPts(c, eye, K.ink); outline(c, eye, { w: 3, color: K.paper, seed: sd + 11, smooth: false, rough: .3 });
+  eyeLines(c, ex, ey, 24, { open: 0, lid: 1, w: 2.8, seed: sd + 12 });
+  // 帽檐下的头：两道贴着卷发的白色轮廓一直垂到画面外
+  for (const d of [-1, 1]) wl([[d * 66, 16], [d * 76, 44], [d * 70, 70], [d * 84, 100], [d * 80, 130]], 20 + d, 2.8);
   // 帽子：黑色剪影，白色刮痕描出帽顶、帽檐、帽带和侧边的蝴蝶结
   const crown = [[-74, -4], [-70, -60], [-46, -96], [0, -108], [46, -96], [70, -60], [74, -4]];
   s7Ink(c, T, crown, sd + 1, { smooth: true }); s7Ink(c, T, ellPts(0, 0, 156, 30, 0, 48), sd + 2, { smooth: true });
-  outline(c, M(T, ellPts(0, 0, 156, 30, 0, 60)), { w: 3.2, color: K.paper, seed: sd + 3, dry: .1 });
-  stroke(c, M(T, crown), { w: 3.2, color: K.paper, seed: sd + 4, taper: .05, dry: .1 });
+  outline(c, M(T, ellPts(0, 0, 156, 30, 0, 60)), { w: 3.2, color: K.paper, seed: sd + 3 });
+  stroke(c, M(T, crown), { w: 3.2, color: K.paper, seed: sd + 4, taper: .05 });
   wl([[-72, -16], [0, -8], [72, -16]], 5, 2.6); wl([[-71, -34], [0, -26], [71, -34]], 6, 2.6);
   outline(c, M(T, [[60, -24], [96, -50], [108, -26], [94, -8]]), { w: 2.6, color: K.paper, seed: sd + 7 });
-  outline(c, M(T, [[60, -24], [88, -2], [80, 18], [64, 4]]), { w: 2.6, color: K.paper, seed: sd + 8 });
-  // 闭着的第三只眼：墨块、白色刮痕描边、只有眼皮线和睫毛；一根管线垂到画面外
-  const [ex, ey] = [1790, H - 250 + (1 - rise) * 260];
-  scratch(c, [[ex - 20, ey + 34], [ex - 44, ey + 110], [ex - 20, ey + 190], [ex - 60, ey + 290]], { w: 3, seed: sd + 9, taper: .1 });
-  block(c, ellPts(ex, ey, 40, 38, .2, 36), K.ink, { amp: 1.6, freq: 10, seed: sd + 10, grain: .5 });
-  outline(c, ellPts(ex, ey, 42, 40, .2, 40), { w: 2.8, color: K.paper, seed: sd + 11, dry: .12 });
-  eyeLines(c, ex, ey, 22, { open: 0, lid: 1, w: 2.6, seed: sd + 12 }); }
+  outline(c, M(T, [[60, -24], [88, -2], [80, 18], [64, 4]]), { w: 2.6, color: K.paper, seed: sd + 8 }); }
 
 // ===================== 木刻剪影角色（局部坐标：脚底中心为原点，向上为负，身高约 250） =====================
 // 萃香：两只大角、举着葫芦往嘴里倒（戒酒打卡），醉得轻轻晃
 function s7Suika(c, x, y, s, t, seed) { const sd = seed + tick(t, 8), T = tf(x, y, s, Math.sin(t * 4.2) * .05);
-  s7Ink(c, T, s7Taper([[-12, -192], [-30, -222], [-52, -244], [-78, -254]], 18, 2), sd + 1);
-  s7Ink(c, T, s7Taper([[12, -194], [28, -226], [48, -250], [74, -264]], 18, 2), sd + 2);
+  s7Ink(c, T, s7Taper([[-16, -190], [-40, -204], [-60, -226], [-66, -256]], 21, 3), sd + 1);
+  s7Ink(c, T, s7Taper([[16, -192], [40, -208], [58, -232], [62, -262]], 21, 3), sd + 2);
+  s7W(c, T, [[-50, -222], [-40, -210]], sd + 22, 2.4);   // 角上系的丝带
   s7Ink(c, T, [[-30, -176], [-34, -140], [-46, -100], [-40, -78], [-24, -100], [-8, -122], [14, -128], [30, -150], [31, -178], [16, -200], [-14, -200]], sd + 3, { smooth: true });
   s7Ink(c, T, [[-20, -146], [20, -146], [26, -112], [44, -46], [-44, -46], [-26, -112]], sd + 4);
   s7Ink(c, T, s7Taper([[-12, -50], [-14, -8]], 13, 11), sd + 5); s7Ink(c, T, s7Taper([[12, -50], [16, -8]], 13, 11), sd + 6);
   s7Ink(c, T, ellPts(-19, -5, 14, 6, 0, 16), sd + 7); s7Ink(c, T, ellPts(22, -5, 14, 6, 0, 16), sd + 8);
-  const m0 = [36, -186], b0 = [94, -218], at = u => [lerp(m0[0], b0[0], u), lerp(m0[1], b0[1], u)];
-  s7Ink(c, T, s7Taper([[16, -140], [42, -150], at(.55)], 15, 12), sd + 9);
-  s7Ink(c, T, s7Taper([at(.12), at(.82)], 12, 12), sd + 10); s7Ink(c, T, ellPts(...at(.82), 22, 22, 0, 24), sd + 11); s7Ink(c, T, ellPts(...at(.38), 14, 14, 0, 20), sd + 12); s7Ink(c, T, ellPts(...at(.06), 7, 7, 0, 12), sd + 13);
-  const [gx, gy] = at(.82); s7W(c, T, [[gx - 12, gy - 10], [gx - 15, gy + 1], [gx - 9, gy + 11]], sd + 14);
-  const [wx, wy] = at(.58); s7W(c, T, [[wx - 6, wy - 9], [wx + 6, wy + 9]], sd + 15, 2.4);
+  const m0 = [30, -174], b0 = [96, -200], at = u => [lerp(m0[0], b0[0], u), lerp(m0[1], b0[1], u)];   // 葫芦：嘴对着嘴，底朝上翘
+  s7Ink(c, T, s7Taper([at(.05), at(.78)], 7, 7), sd + 10); s7Ink(c, T, ellPts(...at(.8), 21, 21, 0, 24), sd + 11); s7Ink(c, T, ellPts(...at(.3), 12, 12, 0, 20), sd + 12); s7Ink(c, T, ellPts(...at(.02), 5, 5, 0, 12), sd + 13);
+  const [gx, gy] = at(.8); s7W(c, T, [[gx - 4, gy - 14], [gx + 7, gy - 12], [gx + 14, gy - 3]], sd + 14);
+  const [wx, wy] = at(.52); s7W(c, T, [[wx - 2, wy - 9], [wx + 2, wy + 7], [wx - 4, wy + 18]], sd + 15, 2);   // 葫芦腰上的系绳
+  s7Ink(c, T, s7Taper([[16, -140], [54, -144], [gx + 2, gy + 18]], 15, 12), sd + 9);   // 手托着葫芦底
   s7Ink(c, T, s7Taper([[-16, -140], [-30, -116], [-36, -92]], 14, 11), sd + 16);
   stroke(c, M(T, [[-36, -92], [-41, -74], [-38, -58]]), { w: 3, color: K.ink, seed: sd + 17, dry: .4, taper: 0 }); s7Ink(c, T, ellPts(-38, -52, 7, 7, 0, 12), sd + 18);
   s7W(c, T, [[-20, -170], [-26, -140], [-34, -108]], sd + 19); s7W(c, T, [[-10, -108], [-16, -78], [-22, -54]], sd + 20); s7W(c, T, [[8, -108], [12, -78], [18, -54]], sd + 21); }
@@ -237,8 +243,8 @@ function s7Reimu(c, x, y, s, t, seed) { const sd = seed + tick(t, 8), T = tf(x, 
   const hem = []; for (let u = -50; u <= 50; u += 5) hem.push([u, -52 + 3 * Math.sin(u / 5)]); s7W(c, T, hem, sd + 20, 2);
   s7W(c, T, [[-6, -112], [-14, -78], [-22, -56]], sd + 21); s7W(c, T, [[8, -112], [16, -80], [24, -58]], sd + 22);
   s7Ink(c, T, s7Taper([[14, -142], [38, -130], [62, -122]], 13, 10), sd + 23);
-  s7Ink(c, T, [[44, -140], [84, -152], [104, -120], [92, -96], [56, -106]], sd + 24, { smooth: true }); s7W(c, T, [[84, -150], [103, -120], [92, -98]], sd + 25, 2.4);
-  s7Ink(c, T, ellPts(114, -122, 13, 7, -.2, 16), sd + 26);
+  s7Ink(c, T, [[42, -138], [96, -132], [104, -108], [100, -80], [80, -84], [58, -98], [44, -116]], sd + 24); s7W(c, T, [[97, -128], [103, -106], [99, -82]], sd + 25, 2.4);
+  s7Ink(c, T, [[98, -130], [118, -130], [136, -129], [139, -124], [122, -119], [100, -118]], sd + 26, { smooth: true }); s7Ink(c, T, [[108, -128], [113, -141], [119, -140], [118, -127]], sd + 29, { smooth: true });
   s7Ink(c, T, [[-16, -142], [-42, -128], [-68, -84], [-42, -72], [-24, -108]], sd + 27, { smooth: true }); s7W(c, T, [[-66, -86], [-42, -74]], sd + 28, 2.4); }
 // 觉：波浪短发、发箍、胸前那只睁开的第三只眼和绕着身子的管线，伸手指着
 function s7Satori(c, x, y, s, t, seed) { const sd = seed + tick(t, 8), T = tf(x, y, s);
@@ -312,7 +318,7 @@ function s7Champion(c, tau) { const ct = tau - S7.C0, CH = S7.CH, t = twos(tau),
   const x0 = CX - cw / 2 + mash[0], y0 = 262 + mash[1], k = .9 + .1 * easeOutBack(sm(CH.on, CH.on + .22, ct, x => x), 1.4), lx = x0 + 64, tw = cw - 128;
   pop(c, CX, y0 + chh / 2, k, () => {
     block(c, rectPts(x0, y0, cw, chh), K.paper, { smooth: false, amp: 1.8, freq: 26, seed: sd, grain: .9, anchor: [x0, y0] });
-    outline(c, rectPts(x0 + 16, y0 + 16, cw - 32, chh - 32), { w: 11, color: K.ink, smooth: false, rough: .35, dry: .05, seed: sd + 1 });
+    outline(c, rectPts(x0 + 16, y0 + 16, cw - 32, chh - 32), { w: 11, color: K.ink, smooth: false, rough: .35, seed: sd + 1 });
     // 头像、用户名、注册时间
     const av = 172; block(c, rectPts(lx, y0 + 58, av, av), K.card, { smooth: false, amp: 1, seed: sd + 2, grain: .4 }); c.save(); c.beginPath(); c.rect(lx, y0 + 58, av, av); c.clip(); s7YukariBust(c, lx, y0 + 58, av, sd + 3); c.restore();
     outline(c, rectPts(lx, y0 + 58, av, av), { w: 3.4, color: K.ink, smooth: false, seed: sd + 4 });
@@ -330,7 +336,7 @@ function s7Champion(c, tau) { const ct = tau - S7.C0, CH = S7.CH, t = twos(tau),
       if (cur && ct < CH.note + .2 && (ct < CH.note || Math.floor(ct * 5) % 2 === 0)) stroke(c, [[cur[0] + 6, cur[1] + 8], [cur[0] + 6, cur[1] - sz * .82]], { w: 4, color: K.ink, seed: sd + 6, taper: 0, smooth: false }); }
     if (ct >= CH.note) zh(c, A[3].note, lx, ay + an.length * lh - 4, { size: 30, color: K.g2, p: writeP(ct, CH.note, A[3].note, .012), seed: 90, tilt: .01, jitter: .01 });
     if (g >= 0 && g < .62) s7Swallow(c, lx - 30, x0 + cw - 34, yc, g, sd + 7);
-    if (ct >= CH.gone) zh(c, A[4].text, lx, ay, { size: sz, weight: 500, color: K.g3, p: writeP(ct, CH.gone, A[4].text, .05), seed: 91, tilt: .01, jitter: .01 });
+    if (ct >= CH.gone) zh(c, A[4].text, lx, ay + 4, { size: 52, weight: 500, color: K.g3, p: writeP(ct, CH.gone, A[4].text, .05), seed: 91, tilt: .01, jitter: .01 });
   }); }
 // s7Typed：匿名用户的评论此刻打出了几个字
 function s7Typed(ct) { const CH = S7.CH; if (ct < CH.anon) return 0; const u = ct - CH.anon - .15; if (u < 0) return S7.ANON_H;
@@ -350,11 +356,11 @@ function s7Outro(c, tau) { const ot = tau - S7.O0, t = twos(tau), sd = 950 + tic
   const ex = CX, ey = 380, R = 150, open = sm(.2, 1.05, ot, easeInOutSine);
   scratch(c, S7CORD, { w: 4, seed: sd, taper: .08 });
   block(c, ellPts(ex, ey, R, R * .95, .2, 56), K.ink, { amp: R * .04, freq: 11, seed: sd + 1, streaks: 3, grain: .6 });
-  outline(c, ellPts(ex, ey, R + 4, R * .95 + 4, .2, 60), { w: 3.2, color: K.paper, seed: sd + 2, dry: .15 });
+  outline(c, rough(ellPts(ex, ey, R + 5, R * .95 + 5, .2, 56), { amp: R * .04, freq: 11, seed: sd + 1 }), { w: 3.6, color: K.paper, seed: sd + 2, smooth: false, rough: .3 });
   eyeLines(c, ex, ey, R * .56, { open, lid: 1, seed: sd + 3 });
-  zh(c, JOKE_OUTRO, CX, 730, { size: 88, weight: 500, color: K.paper, align: 'center', p: writeP(ot, .45, JOKE_OUTRO, .045), seed: 960, tilt: .012, jitter: .012 });
-  zh(c, '北交东方笑话集 发布', CX, 872, { size: 48, color: K.g1, align: 'center', p: writeP(ot, 1.0, '北交东方笑话集 发布', .03), seed: 961, tilt: .012, jitter: .012 });
-  zh(c, '北京交通大学', CX, 944, { size: 44, color: K.g1, align: 'center', p: writeP(ot, 1.2, '北京交通大学', .03), seed: 962, tilt: .012, jitter: .012 }); }
+  zh(c, JOKE_OUTRO, CX, 730, { size: 88, weight: 500, color: K.paper, align: 'center', p: writeP(ot, .4, JOKE_OUTRO, .04), seed: 960, tilt: .012, jitter: .012 });
+  zh(c, '北交东方笑话集 发布', CX, 872, { size: 48, color: K.g1, align: 'center', p: writeP(ot, .9, '北交东方笑话集 发布', .03), seed: 961, tilt: .012, jitter: .012 });
+  zh(c, '北京交通大学', CX, 944, { size: 44, color: K.g1, align: 'center', p: writeP(ot, 1.05, '北京交通大学', .03), seed: 962, tilt: .012, jitter: .012 }); }
 
 scene({ order: 7, key: 'jokes', name: '北交东方笑话集', dur: S7.END, fn: (c, tau) => {
   if (tau < .12 || tau >= S7.OUT) handoffBlack(c);
