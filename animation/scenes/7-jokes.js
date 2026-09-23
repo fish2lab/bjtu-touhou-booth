@@ -355,7 +355,7 @@ const S7CORD = Array.from({ length: 61 }, (_, k) => { const u = k / 60; return [
 function s7Outro(c, tau) { const ot = tau - S7.O0, t = twos(tau), sd = 950 + tick(t, 8); setView(null); inkBg(c); if (ot < .1) return;
   const ex = CX, ey = 380, R = 150, open = sm(.2, 1.05, ot, easeInOutSine);
   scratch(c, S7CORD, { w: 4, seed: sd, taper: .08 });
-  block(c, ellPts(ex, ey, R, R * .95, .2, 56), K.ink, { amp: R * .04, freq: 11, seed: sd + 1, streaks: 3, grain: .6 });
+  block(c, ellPts(ex, ey, R, R * .95, .2, 56), K.ink, { amp: R * .04, freq: 11, seed: sd + 1, grain: .6 });
   outline(c, rough(ellPts(ex, ey, R + 5, R * .95 + 5, .2, 56), { amp: R * .04, freq: 11, seed: sd + 1 }), { w: 3.6, color: K.paper, seed: sd + 2, smooth: false, rough: .3 });
   eyeLines(c, ex, ey, R * .56, { open, lid: 1, seed: sd + 3 });
   zh(c, JOKE_OUTRO, CX, 730, { size: 88, weight: 500, color: K.paper, align: 'center', p: writeP(ot, .4, JOKE_OUTRO, .04), seed: 960, tilt: .012, jitter: .012 });
