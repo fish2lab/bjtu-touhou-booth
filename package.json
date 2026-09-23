@@ -2,14 +2,10 @@
   "name": "bx-booth-screen",
   "private": true,
   "version": "0.1.0",
-  "description": "北交摊位 4K 展示屏：轮播动画与弹幕游戏 POC",
+  "description": "北交摊位 4K 展示屏：手绘短片（Canvas 2D，file:// 播放，渲染成 4K MP4）",
   "scripts": {
-    "vendor": "node scripts/vendor.mjs",
-    "shot": "node scripts/shot.mjs"
-  },
-  "dependencies": {
-    "gsap": "^3.15.0",
-    "pixi.js": "^8.21.0"
+    "frames": "node animation/tools/frames.mjs",
+    "render": "node animation/tools/render.mjs"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

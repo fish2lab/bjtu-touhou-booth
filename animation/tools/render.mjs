@@ -1,7 +1,7 @@
 // 把整部片渲染成 MP4：Playwright 以 file:// 打开 index.html?bare&w=宽度，按帧调用 __drawFrame 取 JPEG，
 // 分 N 段并行（每段一个页面、一个 ffmpeg），最后用 concat 无损拼接。
-//   node animation/tools/render.mjs                     → out/animation-4k.mp4（3840×2160，24fps）
-//   node animation/tools/render.mjs --w 1920 --out out/animation-1080.mp4 --jobs 4 --q scene=hearts
+//   node animation/tools/render.mjs                     → out/booth-4k.mp4（3840×2160，24fps）
+//   node animation/tools/render.mjs --w 1920 --out out/preview.mp4 --jobs 4 --q scene=sanyan
 import { chromium } from 'playwright';
 import { spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
@@ -10,7 +10,7 @@ import fs from 'node:fs';
 
 const argv = process.argv.slice(2);
 const flag = (n, d) => { const k = argv.indexOf(n); return k >= 0 ? argv[k + 1] : d; };
-const w = +flag('--w', 3840), jobs = +flag('--jobs', 4), extra = flag('--q', ''), out = path.resolve(flag('--out', w >= 3840 ? 'out/animation-4k.mp4' : `out/animation-${w}.mp4`));
+const w = +flag('--w', 3840), jobs = +flag('--jobs', 4), extra = flag('--q', ''), out = path.resolve(flag('--out', w >= 3840 ? 'out/booth-4k.mp4' : `out/booth-${w}.mp4`));
 const crf = flag('--crf', '16'), tmp = path.resolve('out/render-tmp'); fs.rmSync(tmp, { recursive: true, force: true }); fs.mkdirSync(tmp, { recursive: true });
 const url = pathToFileURL(path.resolve('animation/index.html')).href + `?bare&w=${w}` + (extra ? '&' + extra : '');
 
