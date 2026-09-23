@@ -4,9 +4,9 @@
 // 颜色压到低饱和、按朝向加一点明暗，外面描一圈墨线，放进木刻画面里不跳。
 //   hinaFumo(c, x, y, h, ang, o)：(x, y) 玩偶坐着的底部中心（放在转台面上），h 玩偶在画面里的高（逻辑单位），
 //   ang 绕竖轴的转角（弧度，0 = 正面朝观众），o.pitch 俯视角（弧度，默认 .2），o.sat 饱和度（0..1，默认 .38），o.line 墨线粗（逻辑单位）
-// 模型素材 CC BY-NC-SA 4.0（tartaric_acid），画面里要署名：见 FUMO_CREDIT。
+// 模型素材来自 TouhouLittleMaid（tartaric_acid）。玩偶出现的画面左下角写 FUMO_CREDIT 署名。
 
-const FUMO_CREDIT = '模型：TouhouLittleMaid · tartaric_acid · CC BY-NC-SA 4.0';
+const FUMO_CREDIT = '@TLM·tartaric_acid';   // 玩偶出现的画面，左下角用小字写这一行（用户定：不写协议）
 // 坐姿：覆盖这几根骨骼的旋转（度，[x, y, z]）。腿向前伸、略向外撇，手搭在腿上；整体下沉，让裙摆落在台面上。
 const FUMO_POSE = { legRight: [-72, 12, 0], legLeft: [-72, -12, 0], armRight: [-34, 0, 4], armLeft: [-34, 0, -4], head: [-4, 0, 0] };
 const FUMO_HIDE = new Set(['blink', 'sinFloat']);   // 眨眼贴片、背后漂着的厄运光斑
