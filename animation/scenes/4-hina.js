@@ -467,7 +467,7 @@ function s4World(c, tau) { const t = twos(tau), sd = tick(t), pan = sm(S4.PAN0, 
   // 河段的字：摊宣原话，左下小字
   s4Screen(c, () => { zh(c, S4TXT.l1, 104, 286, { size: 76, weight: 500, p: writeP(t, 14.45, S4TXT.l1, .045), seed: 41, tilt: .01, jitter: .01 });
     zh(c, S4TXT.l2, 108, 372, { size: 58, weight: 500, p: writeP(t, 14.75, S4TXT.l2, .045), seed: 42, tilt: .01, jitter: .01 });
-    zh(c, S4TXT.flow, 230, 1014, { size: 38, color: K.ink, p: writeP(t, 15.4, S4TXT.flow, .045), seed: 43, tilt: .01, jitter: .01 }); }); }
+    zh(c, S4TXT.flow, 230, 1014, { size: 48, color: K.ink, p: writeP(t, 15.4, S4TXT.flow, .045), seed: 43, tilt: .01, jitter: .01 }); }); }
 // 收尾：墨色顺着水流从左往右漫过来
 function s4Wipe(c, tau) { const u = sm(S4.WIPE, S4.BLACK, tau, easeIn); if (u <= 0) return; s4Screen(c, () => { const X = lerp(-120, W + 220, u), sd = tick(tau, 12), edge = [];
   for (let y = -40; y <= H + 40; y += 40) edge.push([X + 70 * noise1(y / 160, sd) + 40 * Math.sin(y / 90 + u * 6), y]);
