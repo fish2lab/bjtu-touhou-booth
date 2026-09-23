@@ -163,8 +163,9 @@ function s6Line(c, a, b, o = {}) { const { w = 6, p = 1, seed = 1 } = o, dx = b[
 function s6Grid(c, t) { const g = S6.G, [px, py] = S6.P0, t0 = S6.T.pull0, v = 2600, sd = tick(t);
   const seg = (a, b, w, k) => { const d0 = Math.hypot(a[0] - px, a[1] - py), len = Math.hypot(b[0] - a[0], b[1] - a[1]), s0 = t0 + d0 / v, p = sm(s0, s0 + .08 + len / v, t, easeOut);
     if (p > 0) s6Line(c, a, b, { w, p, seed: 40 + k * 3 + sd }); };
-  for (let k = 0; k <= 6; k++) { const y = g.y0 + k * S6.RH, edge = k % 6 === 0, w = edge ? 10 : 6, ext = edge ? 5 : 0; seg([px, y], [g.x0 - ext, y], w, k * 2); seg([px, y], [g.x1 + ext, y], w, k * 2 + 1); }
-  [g.x0, g.xm, g.x1].forEach((x, j) => { const w = j === 1 ? 7 : 10; seg([x, py], [x, g.y0 - 5], w, 20 + j * 2); seg([x, py], [x, g.y1 + 5], w, 21 + j * 2); }); }
+  // 每条线分两半从贴纸那里往两头刻；两半各多起 12 个单位压住对方收尖的线头，接缝处不细
+  for (let k = 0; k <= 6; k++) { const y = g.y0 + k * S6.RH, edge = k % 6 === 0, w = edge ? 10 : 6, ext = edge ? 5 : 0; seg([px + 12, y], [g.x0 - ext, y], w, k * 2); seg([px - 12, y], [g.x1 + ext, y], w, k * 2 + 1); }
+  [g.x0, g.xm, g.x1].forEach((x, j) => { const w = j === 1 ? 7 : 10; seg([x, py + 12], [x, g.y0 - 5], w, 20 + j * 2); seg([x, py - 12], [x, g.y1 + 5], w, 21 + j * 2); }); }
 // s6Head：表头。黑色木刻块盖下来，白字写出「东方二创红黑榜」
 function s6Head(c, t) { const u = t - S6.T.head; if (u < 0) return; const size = 70, bw = zhWidth(c, S6.TITLE, size, ZH, 500) + 96, bh = 104, x = S6.G.xm, y = 100, sd = tick(t);
   const [kx, ky] = s6Squash(u - .1, { fall: .1, from: 1.4, amp: .07 });
