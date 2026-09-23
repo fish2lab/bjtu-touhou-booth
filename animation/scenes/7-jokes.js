@@ -7,14 +7,14 @@
 // 屏上文字只来自 animation/data/jokes.js（逐字）和 docs/素材事实.md（「北交东方笑话集 发布」「北京交通大学」）。
 //   0      只画 handoffBlack，接第 6 段
 //   0.2    第 1 则从右边进来，停在正中
-//   2.4    第 2 则进来，第 1 则退到左边，2.9 被盖章
+//   2.4    第 2 则进来，第 1 则退到左边，2.9 被盖章（手 2.6 伸进来）
 //   5.1    第 3 则进来，第 1 则被推出，第 2 则退到左边，5.6 被盖章
 //   8.3    第 4 则进来，第 3 则退到左边，8.8 被盖章
 //   9.5    第 3 则被推出，第 4 则移到正中，单独停住 2.5 秒
-//   12.34  恋的手伸进来，12.79 第 4 则被盖章，她的帽子和闭着的第三只眼从画面下沿露出来
-//   13.29  一格黑场后聚光灯亮：八云紫的用户资料卡
-//   18.59  觉之瞳睁开，片尾
-//   20.94  只画 handoffBlack（段长 21.06 秒）
+//   12.34  恋的手伸进来，12.64 第 4 则被盖章，她的帽子和闭着的第三只眼从画面下沿露出来
+//   13.14  一格黑场后聚光灯亮：八云紫的用户资料卡
+//   18.44  觉之瞳睁开，片尾
+//   20.79  只画 handoffBlack（段长 20.91 秒）
 
 const S7 = {
   P: 800, Y: 588, XL: 500, XR: 1420, XC: 960, OFFR: 2340, OFFL: -420,   // 方形面板边长、中心高度；左、右、正中三个位置，右边外、左边外
@@ -22,7 +22,7 @@ const S7 = {
   IN0: .2, T1: 2.4, T2: 5.1, T3: 8.3, T4: 9.5, HOLD: 2.5,                 // 进场、三次换人、第 4 则移到正中；单独停住的秒数
   IMP: { w: 520, h: 190 }, IMPY: 232,                                       // 印面（方框）大小；印落在面板中心往下多少（盖在剪影上，不挡包袱）
 };
-S7.HIT4 = S7.T4 + S7.MOVE + S7.HOLD + .45;   // 停够 2.5 秒后手才伸进来，0.45 秒后落章
+S7.HIT4 = S7.T4 + S7.MOVE + S7.HOLD + .3;    // 停够 2.5 秒后手才伸进来，0.3 秒后落章
 S7.C0 = S7.HIT4 + .5;                        // 冠军
 S7.O0 = S7.C0 + 5.3;                         // 片尾
 S7.OUT = S7.O0 + 2.35;                       // 只画 handoffBlack
@@ -45,9 +45,9 @@ S7.STAMPS = [
 // fig(c, 面板左上 x, y, 本段秒数, 落定时刻)：面板底部的木刻剪影
 S7.J = [
   { punch: 1, ss: 48, ps: 66, beat: .3, per: .035, gap: .28, fig: (c, x, y, tau) => s7Suika(c, x + 620, y + 752, 1.08, twos(tau), 300) },
-  { punch: 1, ss: 48, ps: 54, beat: .35, per: .02, gap: .1, fig: (c, x, y, tau, land) => s7Rin(c, x + 540, y + 752, 1.05, twos(tau), 330, 1 + Math.max(0, twos(tau) - land - .5) / .42) },
-  { punch: 2, ss: 46, ps: 52, beat: .35, per: .02, gap: .1, fig: (c, x, y, tau) => s7Reimu(c, x + 560, y + 752, .92, twos(tau), 360) },
-  { punch: 2, ss: 46, ps: 52, beat: .35, per: .02, gap: .1, fig: (c, x, y, tau) => { s7Satori(c, x + 190, y + 752, .88, twos(tau), 390); s7Remilia(c, x + 560, y + 752, .86, twos(tau), 420); } },
+  { punch: 1, ss: 48, ps: 54, beat: .3, per: .016, gap: .1, fig: (c, x, y, tau, land) => s7Rin(c, x + 540, y + 752, 1.05, twos(tau), 330, 1 + Math.max(0, twos(tau) - land - .5) / .42) },
+  { punch: 2, ss: 46, ps: 52, beat: .25, per: .016, gap: .1, fig: (c, x, y, tau) => s7Reimu(c, x + 560, y + 752, .92, twos(tau), 360) },
+  { punch: 2, ss: 46, ps: 52, beat: .3, per: .018, gap: .1, fig: (c, x, y, tau) => { s7Satori(c, x + 190, y + 752, .88, twos(tau), 390); s7Remilia(c, x + 560, y + 752, .86, twos(tau), 420); } },
 ];
 const s7Land = j => S7.LEGS[j][0][0] + S7.MOVE;
 // 冠军那则：匿名用户的评论先慢慢打到「并非，紫」，停一下，后面的乱码一口气滚出来
@@ -55,11 +55,11 @@ S7.ANON = JOKE_CHAMPION.lines[3].text;
 S7.ANON_H = [...S7.ANON.slice(0, S7.ANON.indexOf('“') + 1)].length;   // 名字到左引号：一下子出现
 S7.ANON_Z = [...S7.ANON.slice(0, S7.ANON.indexOf('紫') + 1)].length;  // 打到「紫」为止：一个字一个字打
 S7.ANON_N = [...S7.ANON].length;
-S7.CH = { on: .1, name: .18, reg: .4, rule: .7, nitori: .85, anon: 1.55, slow: .12, pause: .14, fast: .014 };   // 相对冠军开始的秒数
+S7.CH = { on: .1, name: .18, reg: .4, rule: .7, nitori: .85, anon: 1.5, slow: .12, pause: .14, fast: .014 };   // 相对冠军开始的秒数
 S7.CH.mash = S7.CH.anon + .15 + (S7.ANON_Z - S7.ANON_H) * S7.CH.slow + S7.CH.pause;   // 脸滚键盘开始
 S7.CH.note = S7.CH.mash + (S7.ANON_N - S7.ANON_Z) * S7.CH.fast + .1;
-S7.CH.gap = S7.CH.note + .22;                                                          // 隙间张开
-S7.CH.gone = S7.CH.gap + .62;                                                          // 「该用户已注销」
+S7.CH.gap = S7.CH.note + .18;                                                          // 隙间张开
+S7.CH.gone = S7.CH.gap + .58;                                                          // 「该用户已注销」
 
 // ===================== 小工具 =====================
 const s7Ease = u => easeOutBack(u, .7);   // 面板移动：突然动，干脆停住，只多冲出去一点点
@@ -147,11 +147,11 @@ function s7Hand(c, x, y, z, ang, sd) { const T = tf(x, y, z, ang), wl = (pts, k,
   for (let k = 0; k < 3; k++) wl([[-58, -26 + k * 22], [-40, -22 + k * 22], [-26, -25 + k * 22]], 11 + k, 2.4);
   wl([[20, -46], [-6, -40], [-24, -32]], 15, 2.6);   // 拇指
 }
-// s7Stamp：一次盖章。手从边缘伸进来 → 抬一下 → 砸下去（压扁回弹、画面一震）→ 抬起来撤走，露出印
-function s7Stamp(c, st, tau) { const u = tau - st.t; if (u < -.5 || u > .56) return;
+// s7Stamp：一次盖章，共约 0.65 秒。手 0.14 秒伸进来 → 抬一下 → 两帧砸下去（压扁回弹、画面一震）→ 停 0.1 秒 → 抬起来一下子撤走，露出印
+function s7Stamp(c, st, tau) { const u = tau - st.t; if (u < -.3 || u > .38) return;
   const tx = st.x, ty = S7.Y + S7.IMPY, dx = Math.cos(st.arm), dy = Math.sin(st.arm), bw = S7.IMP.w + 50, bh = S7.IMP.h + 46;
-  const d = 1250 * (1 - sm(-.5, -.24, u, easeOutQuint)) + 1250 * sm(.16, .52, u, easeIn);
-  const z = u < -.2 ? 1.28 : u < -.1 ? lerp(1.28, 1.4, easeOut((u + .2) / .1)) : u < 0 ? lerp(1.4, 1, easeIn((u + .1) / .1)) : 1 + .34 * sm(.06, .3, u, easeOut);
+  const d = 1250 * (1 - sm(-.3, -.16, u, easeOutQuint)) + 1300 * sm(.1, .36, u, v => v * v);
+  const z = u < -.16 ? 1.3 : u < -.08 ? lerp(1.3, 1.42, easeOut((u + .16) / .08)) : u < 0 ? lerp(1.42, 1, easeIn((u + .08) / .08)) : 1 + .36 * sm(.08, .24, u, easeOut);
   const q = settle(tau, st.t, { amp: .12, freq: 6, decay: 14, phase: Math.PI / 2 }), x = tx + dx * d, y = ty + dy * d, sd = 800 + S7.STAMPS.indexOf(st) * 40 + tick(twos(tau), 8);
   // 影子：离纸越高，影子越偏、越大
   if (z > 1.01) { const off = (z - 1) * 170; c.save(); c.translate(x + off * .5, y + off * .75); c.rotate(st.rot); c.scale(1 + (z - 1) * .4, 1 + (z - 1) * .4); fillPts(c, rectPts(-bw / 2, -bh / 2, bw, bh), K.ink, .26); c.restore(); }
@@ -336,7 +336,7 @@ function s7Champion(c, tau) { const ct = tau - S7.C0, CH = S7.CH, t = twos(tau),
       if (cur && ct < CH.note + .2 && (ct < CH.note || Math.floor(ct * 5) % 2 === 0)) stroke(c, [[cur[0] + 6, cur[1] + 8], [cur[0] + 6, cur[1] - sz * .82]], { w: 4, color: K.ink, seed: sd + 6, taper: 0, smooth: false }); }
     if (ct >= CH.note) zh(c, A[3].note, lx, ay + an.length * lh - 4, { size: 30, color: K.g2, p: writeP(ct, CH.note, A[3].note, .012), seed: 90, tilt: .01, jitter: .01 });
     if (g >= 0 && g < .62) s7Swallow(c, lx - 30, x0 + cw - 34, yc, g, sd + 7);
-    if (ct >= CH.gone) zh(c, A[4].text, lx, ay + 4, { size: 52, weight: 500, color: K.g3, p: writeP(ct, CH.gone, A[4].text, .05), seed: 91, tilt: .01, jitter: .01 });
+    if (ct >= CH.gone) zh(c, A[4].text, lx, ay + 4, { size: 52, weight: 500, color: K.g3, p: writeP(ct, CH.gone, A[4].text, .035), seed: 91, tilt: .01, jitter: .01 });
   }); }
 // s7Typed：匿名用户的评论此刻打出了几个字
 function s7Typed(ct) { const CH = S7.CH; if (ct < CH.anon) return 0; const u = ct - CH.anon - .15; if (u < 0) return S7.ANON_H;
