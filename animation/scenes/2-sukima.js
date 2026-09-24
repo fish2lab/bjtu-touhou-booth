@@ -2,9 +2,9 @@
 // 第 2 段 隙间月影。拍成「逛画廊」：暖白纸墙上四个开间（每个一屏宽），镜头沿墙横移，一幅一幅看过去。
 // 风格仍然克制：纸墙 SUKIMA_PAPER、墨、灰；暗紫只用在引言和隙间里的眼睛；字全用手写楷体（s2Hand）。
 // 墙的底色画在屏幕坐标里（0 秒时和 handoffSukima 完全一样）；挂画轨、踢脚线、地板、画框、展签画在世界坐标里，用 setView 移镜头。
-// 每一幅：镜头横移到位（easeIO，到位时 settle 过冲），画框在挂绳上晃一下 → 原作停 0.6 秒 → 画上横着划一道细线、两端系小蝴蝶结，
-//   张开成盖满整幅画的黑色隙间，缝里七只睁开的眼睛（紫瞳）各看各的 → 缝盖满时把原作换成东方版，隙间合上 →
-//   展签卡片以左边为轴从墙上翻出来，四行字逐行写出 → 价格写完停 2.2 秒，镜头走向下一幅。
+// 每一幅：镜头横移到位（easeIO，到位时 settle 过冲），画框在挂绳上晃一下 → 原作停 0.35 秒 → 画的上沿横着划一道细线、两端系小蝴蝶结，
+//   张开成扁长的黑色隙间，缝里七只睁开的眼睛（紫瞳）各看各的 → 整道缝从上往下扫过，扫过的部分已是东方版，到下沿合上 →
+//   展签卡片以左边为轴从墙上翻出来，四行字逐行写出 → 价格写完停 1.8 秒，镜头走向下一幅。
 // 第 1 幅开头：挂画轨从左往右画出，画框带着维米尔原作从上方落到挂绳上，右边手写引言；隙间撕开后展签翻出来盖住引言。
 // 结尾：镜头拉远看整面墙四幅并排，一道满屏的隙间撕开，里面是深色页（口号、QQ 群和二维码、四幅规格价格），暗成墨底交给第 3 段。
 // 所有时刻由 S2.T 算出（文件中部的时刻表），改节奏只改 S2.T。按现在的 S2.T：
@@ -32,7 +32,7 @@ const S2 = {
     drop: .3, fall: .4,            // 第 1 幅从上方落下
     q: .5, qGap: .38, qPer: .055, qHold: 1.2,   // 引言：起写、每行间隔、每字秒数、写完后停
     og: .35,                       // 镜头到位后原作停
-    line: .2, open: .35, hold: .2, close: .3,   // 隙间：划线、张开、停、合上
+    line: .2, open: .25, sweep: .7, close: .25,   // 隙间：在画的上沿划线、张开、从上往下扫过整幅画、在下沿合上
     lag: .15, card: .3,            // 隙间合上 lag 秒后展签开始翻出；翻出用时
     rows: [0, .2, .35, .45, .55], per: [.03, .018, .015, .03, .03],   // 展签四行（作品名、原作、角色画师、规格、价格）的起写时刻和每字秒数
     priceHold: 1.8, move: .7,      // 价格写完后停；镜头横移
@@ -54,7 +54,7 @@ const S2EYES = [[-.08, -.52, 70], [.40, -.18, 58], [-.46, -.06, 54], [.08, .22, 
 const s2N = s => [...String(s).replace(/\n/g, '')].length;
 (() => { const T = S2.T, Ws = S2.WORKS, qDone = Math.max(...S2.QUOTE.map((l, j) => T.q + j * T.qGap + s2N(l) * T.qPer)); let arrive = T.drop + T.fall;
   Ws.forEach((w, k) => { const ph = PHOTOS[w.art]; w.pw = Math.round(S2.PH * ph.w / ph.h);   // 画高 640：东方版 1404–2000 像素高，4K 下不放大
-    w.arrive = arrive; w.tear = k ? arrive + T.og : qDone + T.qHold; w.full = w.tear + T.line + T.open; w.swap = w.full + T.hold / 2; w.close = w.full + T.hold;
+    w.arrive = arrive; w.tear = k ? arrive + T.og : qDone + T.qHold; w.full = w.tear + T.line + T.open; w.sw0 = w.full; w.sw1 = w.full + T.sweep; w.close = w.sw1;
     w.flip = w.close + T.lag; w.write = w.flip + T.card; w.priceDone = w.write + T.rows[4] + s2N(w.price) * T.per[4]; w.leave = w.priceDone + T.priceHold; arrive = w.leave + T.move; });
   S2.ZOOM = Ws[Ws.length - 1].leave; S2.GAP = S2.ZOOM + T.zoom + T.wide; S2.DARK = S2.GAP + T.gap; S2.DIM = S2.DARK + T.dark; S2.OUT = S2.DIM + T.dim; S2.END = S2.OUT + T.black; })();
 
@@ -97,20 +97,23 @@ function s2Bow(c, x, y, s, seed, rot = 0) { if (s < 1) return; const T = tf(x, y
   stroke(c, M(T, [[.05, .08], [.26, .66], [.4, 1.22]]), { w: s * .17, color: K.ink, seed: seed + 8, taper: .5 });
   fillPts(c, M(T, ellPts(0, 0, .22, .2, 0, 14)), K.ink); }
 // s2Eyes：隙间里的眼睛。跟着缝张开一只只睁开，每 0.28 秒各自换一个方向看，两只各眨一下；缝开始合上时先闭眼
-function s2Eyes(c, cx, cy, hl, hw, g, t, seed) { const T = S2.T, full = T.line + T.open, shut = full + T.hold;
+function s2Eyes(c, cx, cy, hl, hw, g, t, seed) { const T = S2.T, full = T.line + T.open, shut = full + T.sweep;
   S2EYES.forEach(([u, v, r], j) => { let op = sm(T.line + .08 + j * .03, full + .02 + j * .03, g, easeOut) * (1 - sm(shut - .04, shut + .1, g));
     if ((j === 1 && g > full + .06 && g < full + .15) || (j === 4 && g > full + .18 && g < full + .27)) op = .06;
     if (op <= .02) return; const a = hash(Math.floor((g + j * .11) / .28), seed + j) * TAU;
-    eyeLines(c, cx + u * hl, cy + v * hw, r, { open: op, look: [Math.cos(a) * .9, Math.sin(a) * .9], color: K.paper, iris: K.plum, seed: seed + j * 5 + tick(t, 8), rot: (hash(j, seed) - .5) * .24 }); }); }
-// s2Tear：画上的隙间。先横着划一道细线、两端系蝴蝶结，张开成透镜（长约画宽 1.56 倍、中间高约画高 1.56 倍，张满时盖住整幅画），停一下，合上
-function s2Tear(c, w, px, py, tau, seed) { const T = S2.T, t = twos(tau), g = t - w.tear, end = T.line + T.open + T.hold + T.close; if (g < 0 || g >= end) return;
-  const sd = tick(t, 8), cx = px + w.pw / 2, cy = py + S2.PH / 2, hl = w.pw * .78, HW = S2.PH * .78;
+    eyeLines(c, cx + u * hl, cy + v * hw, r * .5, { open: op, look: [Math.cos(a) * .9, Math.sin(a) * .9], color: K.paper, iris: K.plum, seed: seed + j * 5 + tick(t, 8), rot: (hash(j, seed) - .5) * .24 }); }); }
+// s2SweepY：隙间扫到的高度。从画的上沿外一点扫到下沿外一点；扫过的部分已经换成东方版（s2Frame 按同一个高度裁开两张图，分界线始终藏在缝里）
+const s2SweepY = (w, tau, py) => lerp(py - 30, py + S2.PH + 30, easeIO(clamp((tau - w.sw0) / S2.T.sweep, 0, 1)));
+// s2Tear：画上的隙间。在画的上沿横着划一道细线、两端系蝴蝶结，张开成一道扁长的裂缝（长约画宽 1.6 倍、高 220），缝里的眼睛睁开，
+//   整道缝从上往下扫过整幅画，扫到下沿合上
+function s2Tear(c, w, px, py, tau, seed) { const T = S2.T, t = twos(tau), g = t - w.tear, end = T.line + T.open + T.sweep + T.close; if (g < 0 || g >= end) return;
+  const sd = tick(t, 8), cx = px + w.pw / 2, cy = s2SweepY(w, tau, py), hl = w.pw * .8, HW = 110;
   const len = sm(0, T.line, g, easeOutQuint), open = sm(T.line, T.line + T.open, g, easeOut), shut = sm(end - T.close, end, g, easeIn), hw = HW * open * (1 - shut);
   const a = [cx - hl * len, cy + 6 * len], b = [cx + hl * len, cy - 6 * len];
   if (hw < 3) stroke(c, [a, b], { w: 4, color: K.ink, seed: seed + sd, taper: .25, rough: .2 });
-  else { const q = s2CrackPts(a, b, hw, seed + sd, 0, { pow: .45, wob: .06 }), path = block(c, [...q.L, ...q.R.slice().reverse()], K.ink, { amp: 1.1, freq: 9, seed: seed + 1 + sd, grain: .5, smooth: false });
+  else { const q = s2CrackPts(a, b, hw, seed + sd, 0, { pow: .7, wob: .1 }), path = block(c, [...q.L, ...q.R.slice().reverse()], K.ink, { amp: 1.1, freq: 9, seed: seed + 1 + sd, grain: .5, smooth: false });
     c.save(); c.clip(path); s2Eyes(c, cx, cy, hl, hw, g, t, seed + 30); c.restore();
-    s2Lips(c, q, seed + 3 + sd, lerp(2.2, 3.6, open * (1 - shut))); }
+    s2Lips(c, q, seed + 3 + sd, lerp(3, 5, open * (1 - shut))); }
   const bk = 22 * sm(.06, .24, g, easeOutBack) * (1 - sm(end - .12, end, g)); s2Bow(c, a[0], a[1], bk, seed + 40 + sd, -.1); s2Bow(c, b[0], b[1], bk, seed + 50 + sd, .1); }
 
 // ===================== 墙：挂画轨、踢脚线、地板 =====================
@@ -137,7 +140,8 @@ function s2Frame(c, w, px, py, tau, seed, sd) { const C = S2.C, pw = w.pw, ph = 
   [[-1, -1], [1, -1], [1, 1], [-1, 1]].forEach(([sx, sy], j) => { const x0 = sx < 0 ? px - o : px + pw + o, y0 = sy < 0 ? py - o : py + ph + o;
     scratch(c, [[x0 - sx * 4, y0 - sy * 4], [x0 - sx * (fw - 3), y0 - sy * (fw - 3)]], { w: 1.8, al: .7, dry: 0, taper: .2, seed: seed + 10 + j + sd, smooth: false }); });
   block(c, rectPts(px - m, py - m, pw + m * 2, ph + m * 2), C.card, { smooth: false, amp: .7, freq: 26, seed: seed + 3 + sd, grain: .5 });
-  img(c, t >= w.swap ? w.art : w.og, px, py, pw, ph);
+  if (tau < w.sw0 || tau >= w.sw1) img(c, tau >= w.sw1 ? w.art : w.og, px, py, pw, ph);
+  else { img(c, w.og, px, py, pw, ph); c.save(); c.beginPath(); c.rect(px - 4, py - 4, pw + 8, s2SweepY(w, tau, py) - py + 4); c.clip(); img(c, w.art, px, py, pw, ph); c.restore(); }
   outline(c, rectPts(px - 1, py - 1, pw + 2, ph + 2), { w: 1.6, color: K.g3, seed: seed + 4 + sd, smooth: false, rough: .3 }); }
 
 // ===================== 引言与展签 =====================
