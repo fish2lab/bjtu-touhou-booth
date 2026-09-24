@@ -1,5 +1,5 @@
 'use strict';
-// 第 3 段 帕秋莉的炼金工坊（14.55 秒）。双色油印：只用灰青 K.teal、赭 K.ochre，加墨、纸、灰；墙面是纸加细网点。
+// 第 3 段 帕秋莉的炼金工坊（16.42 秒）。双色油印：只用灰青 K.teal、赭 K.ochre，加墨、纸、灰；墙面是纸加细网点。
 // 一间只点一盏灯的魔药吧台。现场活动：同学「@」cos 帕秋莉当魔药师，六种饮料瓶上贴着对应角色，
 // 他拿三种混在一起给人尝，猜是哪些角色，按猜对的数量给奖励（吧唧、决策币）。
 //   0      只画 handoffBlack，接第 2 段
@@ -7,28 +7,35 @@
 //   1.2    吧台正面写「@ 在现场当魔药师调制饮料」，剪影旁写「@」
 //   1.8    包袱：太田顺也啤酒往前挤，飞来的魔导书把它拍回去；三瓶轮流跳下来倒进烧瓶（倒时瓶身转过去、标签朝后）；
 //          第三次啤酒终于被选上，一倒就冒泡溢出来
-//   7.95   烧瓶一抖搅成一瓶魔药，魔导书把它推到观众面前，冒出问号烟，写「猜是来自哪些角色」
-//   9.55   三个空格依次打钩，写「根据猜对数量决定奖励」，台上出现吧唧和决策币
-//   12.35  烧瓶打嗝、一歪，魔药倒出来；镜头往下摇，药水落到地上，沿 STREAM 流成横贯画面的小溪线
-//   14.4   只画 handoffStream，交给第 4 段
+//   7.95   烧瓶一抖搅成一瓶魔药，8.3 魔导书把它推到观众面前
+//   8.55   镜头推近到烧瓶瓶颈上方（zoom 2.2，0.5 秒）；8.75 起瓶口一股一股冒出三团烟（间隔 0.25 秒），升上去聚成大问号；9.7 问号的点弹出来
+//   9.95   问号聚成，停 1 秒；屏幕左下写「猜是来自哪些角色」（墨色底条，推近期间画在屏幕坐标里）
+//   10.95  镜头拉回全景（0.5 秒）
+//   11.4   三个空格依次打钩，写「根据猜对数量决定奖励」，台上出现吧唧和决策币，啤酒在搁板上蹦两下
+//   13.25  烧瓶打嗝、一歪；13.71 魔药从瓶口倒到台面上，沿台面流到台沿；14.2 从台沿翻下去
+//   13.45  镜头开始往下走（先慢后快再减速），跟着液头经过吧台下半截的台板、台脚、纸色地面；15.45 停住，液头正好落在小溪线上
+//   15.45  落地溅起几滴，沿 STREAM 向左右蔓延到画框外，颜色从灰青变成 K.g3、线宽收到 10；上面的液柱变细、断开，最后几滴落进线里
+//   16.3   只画 handoffStream，交给第 4 段
 // 屏上文字全部抄自 docs/素材事实.md。烧瓶、倒液、问号烟、流成小溪线的画法取自第一稿（分支 salvage/alchemy-v1）。
 
 const S3 = {
-  END: 14.55, IN: .15, OUT: .15,                       // 总长；开头交接黑场、结尾交接小溪线各占多久
+  END: 16.42, IN: .15, OUT: .12,                       // 总长；开头交接黑场、结尾交接小溪线各占多久
   L: { x: 880, y: 160, hw: 130, slope: .22 },           // 吊灯：灯罩下沿中心、半宽；光锥边每横走 1 往下 slope
   on: [.55, .63, .72],                                 // 灯亮、闪灭、再亮
-  ctr: 800, floor: 1100, drop: 1536,                   // 吧台台面、吧台底（地面）；drop 结尾镜头往下摇的距离（512 的倍数，纸纹和交接画面对得上）
+  ctr: 800, floor: 1100, drop: 1536,                   // 吧台台面、吧台正面上半截的底；drop 结尾镜头往下走的距离（512 的倍数，纸纹和交接画面对得上）
+  base: 1290, feet: 1452,                              // 吧台下半截台板的底、台脚落地的高度（都在 drop 以上：镜头停住时看不到吧台的任何部分）
   shelf: { x0: 64, x1: 1066, y: 600 },                 // 墙上放饮料的搁板
   F: { x: 1175, y: 700, r: 100, nw: 46, nh: 95 },      // 烧瓶：球心、半径、瓶颈宽、瓶颈长（台面上的位置）
-  push: { x: 1175, y: 725, s: 1.35 }, pushT: [8.3, 8.55],   // 推到观众面前以后的位置和放大倍数
+  push: { x: 1175, y: 725, s: 1.1 }, pushT: [8.3, 8.55],    // 推到观众面前以后的位置和放大倍数
+  zoom: { x: 1175, y: 480, k: 2.2, in: [8.55, 9.05], out: [10.95, 11.45] },   // 推近：以瓶颈上方为中心放大 2.2 倍；推近、拉回的时间
   mage: 1500,                                          // 魔药师剪影的中心线
-  cap: [.8, 12.5],                                     // 展签出现、收起
+  cap: [.8, 13.4],                                     // 展签出现、收起
   sig: { x: 1258, y: 566, t0: 1.0 },                   // 剪影旁的署名「@」
   sub: { text: '@ 在现场当魔药师调制饮料', x: 96, y: 958, t0: 1.2, t1: 8.3 },
-  guess: { text: '猜是来自哪些角色', x: 96, y: 906, t0: 8.7 },
-  prize: { text: '根据猜对数量决定奖励', x: 1330, y: 958, t0: 9.8 },
-  boxes: { x: 100, y: 948, s: 56, gap: 92, t0: 9.55, ticks: [10.0, 10.25, 10.5] },
-  badge: { x: 1578, y: 736, r: 56, t0: 10.65 }, coin: { x: 1762, y: 748, r: 48, t0: 10.85 },
+  guess: { text: '猜是来自哪些角色', x: 96, y: 906, t0: 9.95 },
+  prize: { text: '根据猜对数量决定奖励', x: 1330, y: 958, t0: 11.45 },
+  boxes: { x: 100, y: 948, s: 56, gap: 92, t0: 11.4, ticks: [11.7, 11.9, 12.1] },
+  badge: { x: 1578, y: 736, r: 56, t0: 12.25 }, coin: { x: 1762, y: 748, r: 48, t0: 12.45 },
   // 三次挑瓶：k 是第几瓶，a 开始转身，lv 倒完后液面高度（占烧瓶直径）
   picks: [{ k: 1, a: 2.6, lv: .2 }, { k: 3, a: 4.6, lv: .38 }, { k: 5, a: 6.55, lv: .56 }],
   // 啤酒三次往前挤：a 挤出来，hit 被书拍（最后一次是被书轻轻点中）
@@ -37,11 +44,15 @@ const S3 = {
   flights: [{ a: 1.98, hit: 2.25, b: 2.62 }, { a: 4.13, hit: 4.4, b: 4.78 }, { a: 6.08, hit: 6.45, b: 6.86, soft: true }, { a: 8.0, hit: 8.3, b: 8.95, push: true }],
   foam: [7.1, 7.32, 7.62, 7.78, 8.05],                 // 啤酒沫：往上冒、冒出瓶口、流到最低、开始退、退完
   mix: [7.95, 8.2],                                    // 烧瓶一抖，搅成一瓶魔药
-  smoke: [8.6, 9.3], lift: [9.3, 9.55], dot: 9.45,     // 问号烟长出来、和瓶口断开、点弹出来
-  q: { x: 1175, y: 346, s: 200 },                      // 问号：竖笔底、大小
-  cheer: [11.35, 11.65],                              // 啤酒在搁板上蹦两下
-  burp: 12.35, tip: [12.6, 12.85], pan: [13.15, 13.95],
-  head: [12.82, 13.4], tail: [13.65, 14.05], spread: [13.5, 14.05], xImp: 660,
+  puffs: [8.75, 9.0, 9.25], dot: 9.7,                  // 三团烟从瓶口冒出来的时间；问号的点弹出来
+  q: { x: 1175, y: 420, s: 160 },                      // 问号：竖笔底、大小（推近后约占屏高 45%）
+  cheer: [12.65, 12.95],                              // 啤酒在搁板上蹦两下
+  burp: 13.25, tip: [13.5, 13.75],                     // 烧瓶打嗝、一歪
+  pour: [13.71, 15.0], land: 13.81, run: [13.81, 14.14],   // 药水从瓶口流出 → 倒空；落到台面；沿台面流到台沿
+  fall: [14.2, 15.45], cam: [13.45, 15.45],            // 液头从台沿落到小溪线；镜头往下走（和落地同时停住）
+  flecks: [14.5, 14.72, 14.93, 15.12],                 // 液柱上脱落的液滴
+  spread: [15.45, 16.25],                              // 落地以后向两边蔓延到画框外
+  xL: 905, xImp: 780,                                  // 药水落到台面的位置；从台沿翻下去的位置（也是落点）
 };
 S3.faint = mix(K.paper, K.teal, .3);                   // 背景线稿的颜色：纸上一层很淡的灰青
 const S3R = 2.2, S3NX = 70;                            // 倒饮料时瓶子的角度；啤酒往前挤的距离
@@ -191,13 +202,13 @@ function s3Potion(c, t, T, st) { const F = S3.F, s = st.s, base = st.y + F.r * s
   if (t < S3.mix[0] + .12) { const ls = s3Levels(t), fizz = t >= S3.foam[0] && t < S3.foam[4];
     for (let k = ls.length - 1; k >= 0; k--) s3Liquid(c, t, st.x, base - D * ls[k].lv, ls[k].col, { amp: fizz ? 7 : 2.5, seed: 411 + k * 5, ph: k * 1.7, s });
     if (fizz || t >= S3.mix[0]) s3Bubbles(c, t, st, base - D * (ls.length ? ls[ls.length - 1].lv : 0), 9, 1.6); return; }
-  const top = lerp(base - D * S3.picks[2].lv, st.y + 50 * s, sm(S3.head[0], S3.tail[0], t)), boil = t < S3.mix[1] + .2 || (t >= S3.burp && t < S3.tip[0]) ? 8 : 3.5;
+  const top = lerp(base - D * S3.picks[2].lv, st.y + 50 * s, sm(S3.pour[0], S3.pour[1], t)), boil = t < S3.mix[1] + .2 || (t >= S3.burp && t < S3.tip[0]) ? 8 : 3.5;
   const lp = s3Liquid(c, t, st.x, top, K.teal, { amp: boil, seed: 421, streaks: 3, s });
   c.save(); c.clip(lp); c.globalCompositeOperation = 'multiply'; const sw = [];
   for (let a = 0; a < TAU * 2.1; a += .14) { const rr = (10 + a * 10.5) * s; sw.push([st.x + Math.cos(a + t * 2.6) * rr * 1.25, st.y + 58 * s + Math.sin(a + t * 2.6) * rr * .5]); }
   stroke(c, sw, { w: 13 * s, color: K.ochre, dry: .22, seed: 425 + tick(t), taper: .35 }); c.globalCompositeOperation = 'source-over';
   s3Bubbles(c, t, st, top, 7, .9); c.restore();
-  if (t >= S3.head[0] && t < S3.tail[0] + .08) stroke(c, M(T, [[F.nw * .16, -F.r * .7], [F.nw * .16, -F.r - F.nh - 6]]), { w: F.nw * .6 * s, color: K.teal, seed: 428 + tick(t), taper: .05, smooth: false }); }
+  if (t >= S3.pour[0] && t < S3.pour[1] + .08) stroke(c, M(T, [[F.nw * .16, -F.r * .7], [F.nw * .16, -F.r - F.nh - 6]]), { w: F.nw * .6 * s, color: K.teal, seed: 428 + tick(t), taper: .05, smooth: false }); }
 // s3Puffs：一串圆团合成一个 Path2D（同一方向的多边形，nonzero 填充就是并集）
 function s3Puffs(list, sd, amp = 1.6) { const P = new Path2D(); list.forEach(([x, y, r], k) => { if (r > 1) P.addPath(polyPath(rough(ellPts(x, y, r, r * .9, k, 18), { amp, freq: 9, seed: sd + k }))); }); return P; }
 // s3Foam：啤酒一倒就冒泡：沫从瓶颈往上顶，冒出瓶口，顺着瓶身流下来，然后退掉，瓶身上留两道赭色的印子
@@ -333,13 +344,37 @@ function s3Counter(c, t) { const y = S3.ctr, sd = 581;
   scratch(c, [[-40, y + 22], [1960, y + 19]], { w: 2.2, seed: sd + 2, al: .45, dry: .4 });
   scratch(c, [[-40, S3.floor - 34], [1960, S3.floor - 36]], { w: 2, seed: sd + 3, al: .35, dry: .5 });
   for (const x of [1120, 1840]) scratch(c, [[x, y + 30], [x + 2, S3.floor - 44]], { w: 1.8, seed: sd + x, al: .3, dry: .5, smooth: false }); }
+// s3CounterLow：吧台正面的下半截（全景里在画面外，结尾镜头往下走才看见）：三块深色横台板，赭色木纹线绕着木节走；
+//   赭色踢脚；三条台脚，脚下一点墨影。全部在 S3.drop 以上，镜头停住时看不到
+const S3GRAIN = (() => { const r = rng(587), lines = [], knots = [];
+  for (let b = 0; b < 3; b++) { const y0 = S3.floor - 4 + b * 64, ks = [[260 + r() * 440, y0 + 30 + (r() - .5) * 8], [1160 + r() * 560, y0 + 30 + (r() - .5) * 8]]; knots.push(...ks);
+    for (let j = 0; j < 3; j++) { const yb = y0 + 14 + j * 16 + (r() - .5) * 4, ph = r() * TAU, fq = 1 / (160 + r() * 120), pts = [];
+      for (let x = -40; x <= 1960; x += 40) { let y = yb + 3 * Math.sin(x * fq + ph); for (const [kx, ky] of ks) y += (yb < ky ? -1 : 1) * 10 * Math.exp(-(((x - kx) / 70) ** 2)); pts.push([x, y]); }
+      lines.push(pts); } }
+  return { lines, knots }; })();
+function s3CounterLow(c, t) { const [, vy, , vh] = viewRect(0); if (vy + vh < S3.floor - 20) return; const sd = 601 + tick(t), yb = S3.base, fy = S3.feet;
+  block(c, [[-60, S3.floor - 10], [1980, S3.floor - 10], [1980, yb], [-60, yb]], K.ink, { smooth: false, amp: 1.6, seed: sd, grain: .8, anchor: [0, 0] });
+  S3GRAIN.lines.forEach((pts, k) => stroke(c, pts, { w: 2, color: K.ochre, seed: sd + 10 + k, dry: .35, al: .85, taper: .05, rough: .3 }));
+  S3GRAIN.knots.forEach(([x, y], k) => outline(c, ellPts(x, y, 15, 6, 0, 16), { w: 2, color: K.ochre, seed: sd + 40 + k, al: .9 }));
+  [S3.floor + 60, S3.floor + 124].forEach((y, k) => scratch(c, [[-40, y], [1960, y - 1]], { w: 1.8, seed: sd + 50 + k, al: .35, dry: .45 }));   // 台板之间的缝
+  block(c, [[-60, yb - 6], [1980, yb - 8], [1980, yb + 14], [-60, yb + 16]], K.ochre, { smooth: false, amp: 1.2, seed: sd + 60, grain: .8 });   // 赭色踢脚
+  for (const x of [150, 1090, 1790]) { const leg = [[x - 28, yb + 12], [x + 28, yb + 12], [x + 20, fy - 16], [x + 27, fy], [x - 27, fy], [x - 20, fy - 16]];
+    block(c, leg, K.ink, { smooth: false, amp: 1.2, seed: sd + x, grain: .6 }); scratch(c, [[x - 17, yb + 24], [x - 13, fy - 20]], { w: 2.2, seed: sd + x + 1, al: .6, dry: .3 });
+    stroke(c, [[x - 74, fy + 6], [x + 74, fy + 5]], { w: 5, seed: sd + x + 2, al: .35, dry: .5, taper: .4 }); } }
 
 // ===================== 字、打钩、奖品 =====================
 const s3Hand = (c, str, x, y, o = {}) => zh(c, str, x, y, { size: 60, color: K.paper, tilt: .01, jitter: .01, weight: 500, ...o });
-function s3Words(c, t) { const { sub, guess, prize, boxes: bx } = S3, sd = tick(t);
+// s3GuessCard：「猜是来自哪些角色」写在一条墨色底条上。推近时底下是墙和搁板，白字要有底；
+//   拉回全景以后画在世界坐标里同一个位置，底条落在同样是墨色的吧台正面上，看不出来（纹理都对齐世界原点）
+function s3GuessCard(c, t) { const g = S3.guess; if (t < g.t0) return; const size = 64, w = zhWidth(c, g.text, size, ZH, 500), k = easeOutQuint(clamp((t - g.t0) / .18, 0, 1));
+  if (k > .02) block(c, rectPts(g.x - 34, g.y - 74, (w + 68) * k, 104), K.ink, { smooth: false, amp: 1.6, seed: 47 + tick(t), grain: .8, anchor: [0, 0] });
+  s3Hand(c, g.text, g.x, g.y, { size, p: writeP(t, g.t0 + .1, g.text, .05), seed: 42 }); }
+// s3Overlay：推近期间固定在屏幕上的字：setView(null) 画完，再把镜头放回去
+function s3Overlay(c, t, tau) { if (t < S3.guess.t0 || tau >= S3.zoom.out[1]) return; const v = VIEW; setView(null); resetT(c); s3GuessCard(c, t); setView(v); viewT(c); }
+function s3Words(c, t, tau) { const { sub, prize, boxes: bx } = S3, sd = tick(t);
   if (t >= sub.t0 && t < sub.t1) s3Hand(c, sub.text, sub.x, sub.y, { size: 58, p: writeP(t, sub.t0, sub.text, .045), seed: 41 });
-  if (t >= guess.t0) s3Hand(c, guess.text, guess.x, guess.y, { size: 64, p: writeP(t, guess.t0, guess.text, .05), seed: 42 });
-  if (t >= prize.t0) s3Hand(c, prize.text, prize.x, prize.y, { size: 54, p: writeP(t, prize.t0, prize.text, .045), seed: 43 });
+  if (tau >= S3.zoom.out[1]) s3GuessCard(c, t);        // 拉回全景以后跟着吧台走（推近期间由 s3Overlay 画）
+  if (t >= prize.t0) s3Hand(c, prize.text, prize.x, prize.y, { size: 54, p: writeP(t, prize.t0, prize.text, .04), seed: 43 });
   // 三个空格，依次打钩
   for (let k = 0; k < 3; k++) { const x = bx.x + k * bx.gap, y = bx.y, p = sm(bx.t0 + k * .08, bx.t0 + k * .08 + .2, t, easeOut); if (p <= 0) continue;
     outline(c, rectPts(x, y, bx.s, bx.s), { w: 4, color: K.paper, p, seed: 45 + k + sd, smooth: false, rough: .3 });
@@ -367,23 +402,27 @@ function s3Caption(c, tau) { caption(c, '帕秋莉的炼金工坊', tau, S3.cap[
 function s3Q(x, y, s) { const hook = [], cx = x, cy = y - .55 * s, r = .32 * s;
   for (let a = 200; a <= 400; a += 15) hook.push([cx + Math.cos(a * Math.PI / 180) * r, cy + Math.sin(a * Math.PI / 180) * r]);
   hook.push([x + .06 * s, y - .16 * s], [x, y - .1 * s], [x, y + .06 * s]); return { hook, dot: [x, y + .27 * s] }; }
-// 烟从推到前面的烧瓶口升起，沿「瓶口 → 问号的点 → 竖笔 → 钩子」长出来；长满以后瓶口到竖笔底这一段断开，点单独弹出来
-const S3QPATH = (() => { const { x, y, s } = S3.q, q = s3Q(x, y, s), P = S3.push, F = S3.F, m = [P.x, P.y - (F.r + F.nh + 9) * P.s];
-  const pts = spline([m, q.dot, ...q.hook.slice().reverse()], 4, false), cum = [0]; for (let k = 1; k < pts.length; k++) cum.push(cum[k - 1] + Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]));
-  let stem = 0; for (let k = 0; k < pts.length; k++) if (pts[k][1] > y + .06 * s - 1) stem = cum[k];
-  return { pts, cum, L: cum[cum.length - 1], stem, dot: q.dot }; })();
-function s3QAt(s) { const { pts, cum } = S3QPATH; let k = 1; while (k < pts.length - 1 && cum[k] < s) k++; const u = clamp((s - cum[k - 1]) / ((cum[k] - cum[k - 1]) || 1), 0, 1), a = pts[k - 1], b = pts[k];
-  return { x: lerp(a[0], b[0], u), y: lerp(a[1], b[1], u), a: Math.atan2(b[1] - a[1], b[0] - a[0]) }; }
-function s3Smoke(c, t) { const { L, stem, dot } = S3QPATH, head = sm(S3.smoke[0], S3.smoke[1], t, easeInOutSine) * L; if (head <= 0) return;
-  const tail = sm(S3.lift[0], S3.lift[1], t, easeIn) * stem, sd = 431 + tick(t), bob = t > S3.smoke[1] ? Math.sin(t * 2.2) * 4 : 0, list = [];
-  for (let s = tail; s <= head; s += 12) { const q = s3QAt(s), wob = noise1(s / 40 + t * 1.5, 7) * 7 * (1 - sm(S3.smoke[1], S3.smoke[1] + .4, t)), n = q.a + Math.PI / 2;
-    const r = (22 + 5 * noise1(s / 28, 3)) * clamp((head - s) / 70 + .3, .3, 1) * clamp((s - tail) / 36 + .45, .45, 1);
-    list.push([q.x + Math.cos(n) * wob, q.y + Math.sin(n) * wob + bob, r]); }
-  const dk = easeOutBack(sm(S3.dot, S3.dot + .22, t, v => v)); if (dk > 0) [[0, 0, 26], [-10, 5, 17], [10, 4, 17]].forEach(([u, v, r]) => list.push([dot[0] + u * dk, dot[1] + v * dk + bob, r * dk]));
-  const P = s3Puffs(list, sd); c.save(); c.fillStyle = mix(K.paper, K.teal, .78); c.fill(P); c.globalCompositeOperation = 'multiply'; c.translate(8, 6); s3Screen(c, P, K.ochre, 1); c.restore();
+// 三团烟各聚成钩子的一段（左端和顶、右边和弯、竖笔）。每段是一串圆团的目标位置 [x, y, 半径]，c 是这一段的中心
+const S3QP = (() => { const { x, y, s } = S3.q, q = s3Q(x, y, s), hook = spline(q.hook, 4, false), L = pathLength(hook), P = S3.push, F = S3.F, R = s * .11;
+  const segs = [[0, .4], [.4, .72], [.72, 1]].map(([a, b], k) => { const n = Math.max(3, Math.round((b - a) * L / (R * .6))), pts = [];
+    for (let j = 0; j <= n; j++) { const p = pathAt(hook, lerp(a, b, j / n)); pts.push([p.x, p.y, R * (1 + .16 * noise1(j * .8 + k * 5, 3))]); }
+    return { pts, c: [pts.reduce((m, p) => m + p[0], 0) / pts.length, pts.reduce((m, p) => m + p[1], 0) / pts.length] }; });
+  return { segs, dot: q.dot, R, mouth: [P.x, P.y - (F.r + F.nh + 9) * P.s] }; })();
+// s3Smoke：问号烟。每团烟从瓶口冒出来（小团、后面拖一截细尾巴），沿一道弯弧升到自己那一段的中心，边升边长大，
+//   然后从一团摊开成钩子的一段；三段接上以后，点从瓶口弹出来（越过头一点再落回）。聚成以后轻轻上下浮
+function s3Smoke(c, t) { const { segs, dot, R, mouth: m } = S3QP; if (t < S3.puffs[0]) return; const sd = 431 + tick(t), bob = Math.sin(t * 2.2) * 3, list = [];
+  segs.forEach((g, k) => { const te = S3.puffs[k]; if (t < te) return;
+    const ur = sm(te, te + .3, t, easeOut), us = sm(te + .22, te + .5, t, easeIO), sw = [-70, 60, -40][k], ctl = [(m[0] + g.c[0]) / 2 + sw, (m[1] + g.c[1]) / 2 + 12];
+    const at = u => { const v = 1 - u; return [v * v * m[0] + 2 * v * u * ctl[0] + u * u * g.c[0], v * v * m[1] + 2 * v * u * ctl[1] + u * u * g.c[1]]; };
+    const [px, py] = at(ur), sc = lerp(.2, 1, us), grow = lerp(.4, 1, ur) * lerp(1.25, 1, us), wob = 6 * (1 - .7 * us);
+    g.pts.forEach(([x, y, r], j) => list.push([px + (x - g.c[0]) * sc + wob * noise1(t * 1.6 + j * .9, 11 + k), py + (y - g.c[1]) * sc + wob * noise1(t * 1.6 + j * .9, 17 + k) + bob * us, r * grow]));
+    if (ur < 1) for (let i = 1; i <= 3; i++) { const u = ur - i * .12; if (u <= 0) continue; const [x, y] = at(u); list.push([x, y, R * (.75 - i * .15) * (1 - ur) + 1.5]); } });
+  if (t >= S3.dot) { const k = easeOutBack(clamp((t - S3.dot) / .25, 0, 1), 2.6), s = S3.q.s, p = [lerp(m[0], dot[0], k), lerp(m[1], dot[1], k)];
+    [[0, 0, .13], [-.05, .025, .085], [.05, .02, .085]].forEach(([u, v, r]) => list.push([p[0] + u * s * k, p[1] + v * s * k + bob, r * s * Math.max(0, k)])); }
+  const P = s3Puffs(list, sd, 2.2); c.save(); c.fillStyle = mix(K.paper, K.teal, .78); c.fill(P); c.globalCompositeOperation = 'multiply'; c.translate(6, 5); s3Screen(c, P, K.ochre, 1); c.restore();
   texture(c, P, 'paper', .7, S3.q.x, S3.q.y);
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; for (const [x, y, r] of list) { x0 = Math.min(x0, x - r); y0 = Math.min(y0, y - r); x1 = Math.max(x1, x + r); y1 = Math.max(y1, y + r); }
-  drybrush(c, P, [[x0, y0], [x1, y1]], { n: 7, dir: -.6, seed: sd + 50, w: 2, al: .8 }); }
+  drybrush(c, P, [[x0, y0], [x1, y1]], { n: 7, dir: -.6, seed: sd + 50, w: 1.6, al: .8 }); }
 
 // ===================== 结尾：魔药倒出来，流成小溪线 =====================
 // s3Sub：折线上弧长比例 a..b 的一段
@@ -393,19 +432,51 @@ function s3Sub(pts, a, b) { const cum = [0]; for (let k = 1; k < pts.length; k++
   const out = [at(A)]; for (let k = 0; k < pts.length; k++) if (cum[k] > A && cum[k] < B) out.push(pts[k]); out.push(at(B)); return out; }
 // s3StreamY：交接小溪线 STREAM 在横坐标 x 处的高度
 function s3StreamY(x) { const f = clamp((x + 40) / 42, 0, STREAM.length - 1.001), k = Math.floor(f); return lerp(STREAM[k][1], STREAM[k + 1][1], f - k); }
-const S3STREAM = STREAM.map(([x, y]) => [x, y + S3.drop]);   // 镜头往下摇 drop 以后，小溪线在世界里的位置
-function s3Outflow(c, t, st) { const F = S3.F, headP = sm(S3.head[0], S3.head[1], t, easeIn), tailP = sm(S3.tail[0], S3.tail[1], t, easeIn); if (headP <= 0 || tailP >= 1) return;
-  const T = tf(st.x, st.y, st.s, st.rot), m = T(0, -F.r - F.nh - 4), d = [Math.sin(st.rot), -Math.cos(st.rot)], xf = S3.xImp, yI = S3.drop + s3StreamY(xf), sd = tick(t);
-  const path = spline([m, [m[0] + d[0] * 34, m[1] + d[1] * 34 + 6], [lerp(m[0], xf, .82), m[1] + 44], [xf, m[1] + 120], [xf, lerp(m[1] + 120, yI, .5)], [xf, yI]], 5, false), seg = s3Sub(path, tailP, headP);
-  if (seg.length < 2) return; stroke(c, seg, { w: 15, color: K.teal, seed: 451 + sd, taper: .06, rough: .25, wfn: f => 1 - .25 * f });
-  scratch(c, seg.map(([x, y]) => [x - 3, y]), { w: 2, seed: 452 + sd, al: .6, dry: .5 }); }
-function s3Spread(c, t) { const k = sm(S3.spread[0], S3.spread[1], t, easeOut), xI = S3.xImp, yI = S3.drop + s3StreamY(xI), sd = tick(t); if (k <= 0) return;
-  const xl = lerp(xI, -90, k), xr = lerp(xI, 2010, k), col = mix(K.teal, K.g3, sm(S3.spread[0] + .05, S3.spread[1], t));
-  c.save(); c.beginPath(); c.rect(xl, S3.drop - 200, xr - xl, 1500); c.clip(); stroke(c, S3STREAM, { w: 10, color: col, seed: 5, taper: 0, rough: .25 }); c.restore();
-  for (const x of [xl, xr]) if (x > 0 && x < W) block(c, ellPts(x, S3.drop + s3StreamY(x), 8, 6.5, 0, 14), col, { amp: .8, seed: 461 + sd, grain: 0 });
-  // 落点：一小摊药水，溅起几滴，然后缩回线里
-  const pool = sm(S3.spread[0], S3.spread[0] + .1, t, easeOut) * (1 - sm(S3.spread[0] + .2, S3.tail[1] - .02, t)); if (pool > 0) block(c, ellPts(xI, yI, 34 * pool, 12 * pool, 0, 20), K.teal, { amp: 1.4, seed: 462 + sd, grain: .4 });
-  const sp = sm(S3.spread[0], S3.spread[0] + .24, t, v => v); if (sp > 0 && sp < 1) [[-70, 60], [-34, 90], [20, 100], [58, 70], [96, 40]].forEach(([dx, h], j) => { const [x, y] = arc([xI, yI], [xI + dx, yI + 6], sp, h), r = 6 * (1 - sp * .5); fillPts(c, ellPts(x, y, r, r, 0, 10), K.teal); }); }
+const S3STREAM = STREAM.map(([x, y]) => [x, y + S3.drop]);   // 镜头往下走 drop 以后，小溪线在世界里的位置
+// 镜头往下走的距离：曲线 5u⁴ - 4u⁵，起步很慢（药水在台面上流的时候只挪一点），最快在 3/4 处，最后 1/4 减速停住。s3DropV 是速度
+const s3Drop = tau => { const u = clamp((tau - S3.cam[0]) / (S3.cam[1] - S3.cam[0]), 0, 1); return S3.drop * u ** 4 * (5 - 4 * u); };
+const s3DropV = tau => { const d = S3.cam[1] - S3.cam[0], u = (tau - S3.cam[0]) / d; return u <= 0 || u >= 1 ? 0 : S3.drop * 20 * u ** 3 * (1 - u) / d; };
+const S3LIP = S3.ctr + 8;                                    // 台沿：赭色台面条的下沿
+// 液头在屏幕上的高度：关键帧 [下落进度, 屏幕 y, 每单位进度的斜率]，三次 Hermite 连起来；世界坐标 = 镜头下移 + 屏幕高度。
+//   起点是台沿此刻在屏幕上的位置，斜率让液头在世界里以 150/s 慢慢翻下去；中段停在屏幕 53% 附近跟着镜头走；
+//   镜头最后 1/4 减速，液头从 580 落到小溪线（落地时世界里的速度 1350/s）。镜头和液头都用连续的 tau，液头在屏幕上不抖
+const S3HEADK = (() => { const [f0, f1] = S3.fall, Df = f1 - f0; return [[0, S3LIP - s3Drop(f0), (150 - s3DropV(f0)) * Df], [.3, 570, 0], [.7, 580, 60], [1, s3StreamY(S3.xImp), 1350 * Df]]; })();
+function s3HeadY(tau) { const [f0, f1] = S3.fall, K = S3HEADK, v = clamp((tau - f0) / (f1 - f0), 0, 1); let k = 0; while (k < K.length - 2 && v > K[k + 1][0]) k++;
+  const [a, sa, ma] = K[k], [b, sb, mb] = K[k + 1], h = b - a, u = (v - a) / h, u2 = u * u, u3 = u2 * u;
+  return s3Drop(tau) + (2 * u3 - 3 * u2 + 1) * sa + (u3 - 2 * u2 + u) * h * ma + (-2 * u3 + 3 * u2) * sb + (u3 - u2) * h * mb; }
+// 倒空以后，液柱的尾巴离开台沿往下掉（初速 300/s，加速度 2560/s²），约 0.95 秒后落进线里
+const s3TailY = tau => { const u = tau - S3.pour[1]; return u <= 0 ? S3LIP : S3LIP + 300 * u + 1280 * u * u; };
+// s3Pour：瓶口 → 抛一道弧落到台面 → 沿台面往左流到台沿 → 在台沿鼓出一滴（之后由 s3Column 接着往下落）
+function s3Pour(c, t, st) { const [p0, p1] = S3.pour; if (t < p0) return; const F = S3.F, T = tf(st.x, st.y, st.s, st.rot), m = T(0, -F.r - F.nh - 4), d = [Math.sin(st.rot), -Math.cos(st.rot)], sd = tick(t);
+  const yTop = S3.ctr - 9, xL = S3.xL, xI = S3.xImp;
+  const arcP = spline([m, [m[0] + d[0] * 30, m[1] + d[1] * 30 + 4], [lerp(m[0], xL, .7), lerp(m[1], yTop, .35)], [xL, yTop]], 4, false), seg = s3Sub(arcP, sm(p1, p1 + .12, t, easeIn), sm(p0, S3.land, t, easeIn));
+  if (seg.length > 1) { stroke(c, seg, { w: 13, color: K.teal, seed: 441 + sd, taper: .08, rough: .25 }); scratch(c, seg.map(([x, y]) => [x + 2, y - 2]), { w: 1.8, seed: 442 + sd, al: .55, dry: .5 }); }
+  if (t < S3.land) return; const run = sm(S3.run[0], S3.run[1], t, easeInOutSine), xF = lerp(xL, xI - 4, run);
+  block(c, ellPts(xL, yTop, 18 + 4 * run, 7, 0, 16), K.teal, { amp: 1, seed: 443 + sd, grain: .3 });                        // 落到台面的一小摊
+  if (xL - xF > 4) stroke(c, [[xL + 20, yTop], [lerp(xL, xF, .5), yTop + 1], [xF, yTop + 1]], { w: 12, color: K.teal, seed: 444 + sd, taper: .12, rough: .3 });   // 沿台面往台沿流
+  const lip = sm(S3.run[1], S3.fall[0], t, easeOut); if (lip > 0) block(c, ellPts(xI, S3LIP - 5 + 5 * lip, 8 + 3 * lip, 6 + 5 * lip, 0, 14), K.teal, { amp: .8, seed: 445 + sd, grain: .3 }); }
+// s3Column：从台沿落下去的液柱（宽约 19，毛边，一侧一道纸色刮痕），液头一颗略大的水滴；下落途中偶尔脱落几滴。
+//   倒空以后液柱变细、尾巴断成几滴落进线里。落地时一小摊，溅起几滴
+function s3Column(c, t, tau) { const [f0, f1] = S3.fall; if (tau < f0) return;
+  const x = S3.xImp, yl = S3.drop + s3StreamY(x), head = Math.min(s3HeadY(tau), yl), tail = s3TailY(tau), sd = tick(t), broke = tau > S3.pour[1];
+  const top = broke ? tail + 90 : S3LIP, w = 19 * (1 - .4 * sm(S3.pour[1], S3.pour[1] + .8, tau, v => v)), wx = y => x + 2.4 * noise1(y / 110, 7);   // 液柱微微弯（弯在世界里，不随镜头抖）
+  if (head - top > 6) { const pts = []; for (let y = top; y < head; y += 24) pts.push([wx(y), y]); pts.push([wx(head), head]);
+    stroke(c, pts, { w, color: K.teal, seed: 451 + sd, taper: .02, rough: .3, wfn: broke ? f => .45 + .55 * sm(0, .25, f, v => v) : null });
+    scratch(c, pts.map(([px, py]) => [px - w * .22, py]), { w: 2.2, seed: 452 + sd, al: .55, dry: .5 }); }
+  if (tau < f1) block(c, ellPts(wx(head), head - 6, w * .62, w * .85, 0, 16), K.teal, { amp: .9, seed: 453 + sd, grain: .3 });
+  S3.flecks.forEach((ts, k) => { const u = tau - ts; if (u < 0 || u > .38) return; const dir = k % 2 ? 1 : -1, y = s3HeadY(ts) - 60 + (s3HeadY(tau) - s3HeadY(ts)) * .8, r = 6.5 * (1 - u / .38);
+    if (r > 1) block(c, ellPts(x + dir * (w * .6 + 120 * u), y, r, r * 1.3, 0, 12), K.teal, { amp: .6, seed: 470 + k + sd, grain: 0 }); });
+  if (broke) [[0, 4.5], [34, 6], [64, 7.5]].forEach(([dy, r], j) => { const y = tail + dy; if (y < yl - 6) block(c, ellPts(wx(y), y, r, r * 1.35, 0, 12), K.teal, { amp: .5, seed: 474 + j + sd, grain: 0 }); });
+  const pool = sm(f1, f1 + .1, t, easeOut) * (1 - sm(f1 + .2, f1 + .6, t)); if (pool > 0) block(c, ellPts(x, yl, 34 * pool, 12 * pool, 0, 20), K.teal, { amp: 1.4, seed: 462 + sd, grain: .4 });
+  const sp = sm(f1, f1 + .26, t, v => v); if (sp > 0 && sp < 1) [[-70, 60], [-34, 92], [20, 104], [58, 72], [96, 40]].forEach(([dx, h]) => { const [px, py] = arc([x, yl], [x + dx, yl + 6], sp, h), r = 6 * (1 - sp * .5); fillPts(c, ellPts(px, py, r, r, 0, 10), K.teal); }); }
+// s3Spread：落地以后沿 STREAM 同时向左右蔓延到画框外（easeOut），颜色从灰青过渡到 K.g3、线宽从 20 收到 10；
+//   两头的前沿是毛边的一小团，前面跑着两颗小液滴。蔓延完就是 handoffStream 的那条线（同样的点、同样的参数），接缝处不跳
+function s3Spread(c, t) { const [a, b] = S3.spread; if (t < a) return;
+  if (t >= b) return stroke(c, S3STREAM, { w: 10, color: K.g3, seed: 5, taper: 0, rough: .25 });
+  const k = sm(a, b, t, easeOut), e = sm(a, b - .1, t), xI = S3.xImp, xl = lerp(xI, -90, k), xr = lerp(xI, 2010, k), w = lerp(20, 10, e), col = e >= 1 ? K.g3 : mix(K.teal, K.g3, e), sd = tick(t), yS = x => S3.drop + s3StreamY(x);
+  c.save(); c.beginPath(); c.rect(xl, S3.drop - 200, xr - xl, 1500); c.clip(); stroke(c, S3STREAM, { w, color: col, seed: 5, taper: 0, rough: .25 }); c.restore();
+  [[xl, -1], [xr, 1]].forEach(([x, d], j) => { if (x > -30 && x < W + 30) block(c, ellPts(x, yS(x), w * .8 + 3, w * .55 + 2.5, 0, 14), col, { amp: 1.3, spike: .15, spikeLen: 5, seed: 461 + j * 3 + sd, grain: 0 });
+    [[24, 4.4], [52, 3.2]].forEach(([dx, r], i) => { const xd = x + d * dx * (1 - .35 * k); if (xd > -20 && xd < W + 20) block(c, ellPts(xd, yS(xd), r, r * .8, 0, 10), col, { amp: .5, seed: 465 + j * 2 + i + sd, grain: 0 }); }); }); }
 
 // ===================== 整个画面 =====================
 // 灯下的光锥：油印的做法，光照到的地方不印网点、纸色亮一档（明暗差 3%，不用渐变）
@@ -413,12 +484,12 @@ const S3CONE = (() => { const { x, y, hw } = S3.L; return [[x - hw, y], [x + hw,
 function s3Wall(c, t) { paperBg(c); const cone = polyPath(rough(S3CONE, { amp: 2.5, freq: 24, seed: 531 + tick(t), smooth: false }));
   c.save(); c.fillStyle = K.card; c.globalAlpha = .75; c.fill(cone); c.restore();
   const dots = new Path2D(S3WALL); dots.addPath(cone); c.save(); c.clip(dots, 'evenodd'); texture(c, S3WALL, 'dots', .9); c.restore(); }
-function s3World(c, t) { s3Wall(c, t);
+function s3World(c, t, tau) { s3Wall(c, t);
   s3Backdrop(c); s3Shelf(c, t);
   const bs = S3B.map((b, k) => s3BottleState(k, t)); bs.forEach((st, k) => { if (!st.moving) s3Bottle(c, S3B[k], st, t); });
   s3Ceiling(c, t); s3Lamp(c, t, true);
   const bk = s3BookAt(t); s3Mage(c, t, bk); s3Sig(c, t);
-  s3Counter(c, t); s3Words(c, t);
+  s3CounterLow(c, t); s3Counter(c, t); s3Words(c, t, tau);
   const fs = s3FlaskState(t), pushed = t >= S3.pushT[0];
   if (!pushed) { s3Ring(c, t, fs); s3Flask(c, t, fs, T => s3Potion(c, t, T, fs)); }
   bs.forEach((st, k) => { if (!st.moving) return; const b = S3B[k]; s3Bottle(c, b, st, t);
@@ -429,13 +500,16 @@ function s3World(c, t) { s3Wall(c, t);
   s3Prizes(c, t);
   if (pushed) { s3Ring(c, t, { ...fs, rot: 0 }); s3Flask(c, t, fs, T => s3Potion(c, t, T, fs)); }
   if (bk) s3Book(c, t, bk);
-  s3Smoke(c, t); s3Outflow(c, t, fs); s3Spread(c, t); }
+  s3Smoke(c, t); s3Pour(c, t, fs); s3Column(c, t, tau); s3Spread(c, t); }
+// s3View：本段的镜头（连续的 tau）。推近到瓶颈上方、拉回全景（zoom 按指数插值，推的快慢看着匀）；结尾往下走 s3Drop
+function s3View(tau) { const Z = S3.zoom, z = sm(Z.in[0], Z.in[1], tau, easeIO) * (1 - sm(Z.out[0], Z.out[1], tau, easeIO));
+  return { x: lerp(CX, Z.x, z), y: lerp(CY, Z.y, z) + s3Drop(tau), zoom: Math.pow(Z.k, z) }; }
 
 scene({ order: 3, key: 'alchemy', name: '帕秋莉的炼金工坊', dur: S3.END, fn: (c, tau) => {
   if (tau < S3.IN) return handoffBlack(c);
   if (tau >= S3.END - S3.OUT) return handoffStream(c);
-  const t = twos(tau); setView({ x: CX, y: CY + S3.drop * sm(S3.pan[0], S3.pan[1], tau, easeInOutSine), zoom: 1 });
+  const t = twos(tau); setView(s3View(tau));
   const lit = tau >= S3.on[0] && !(tau >= S3.on[1] && tau < S3.on[2]);
-  if (lit) s3World(c, t); else { inkBg(c); s3Lamp(c, t, false); }
+  if (lit) { s3World(c, t, tau); s3Overlay(c, t, tau); } else { inkBg(c); s3Lamp(c, t, false); }
   s3Caption(c, tau);
 } });
