@@ -26,7 +26,7 @@ const S5 = {
   DROOP: 3.95,                                                       // 魔理沙帽尖垂下来
   GROW: [4.3, 4.65],                                                 // 第三格撑满全屏
   SAY: 4.7, SMALL: 5.05, K2: [5.1, 5.45], PRICE: 5.35, UNDER: 6.2, GLINT: 7.3, PEEK: 7.9,   // PEEK 魔理沙从右下角探出耷拉的帽子
-  FALL: 9.9, ZOOM: [10.2, 10.55], BOX: [10.55, 10.85], DOT: [11.5, 11.85], OUT: 11.85,
+  FALL: 9.9, ZOOM: [10.2, 10.55], BOX: [10.55, 11.2], DOT: [11.5, 11.85], OUT: 11.85,
   TX: 110, ROD: 155, A1: 1225, A2: 1640, LC: 150, CS: 1.25,          // 全屏那一页：字的左边、横杆高度、两个挂件的吊点、链长、挂件缩放
   YING: 350, BOXR: 220, YC: .35,                                     // 收尾「赢」的字号、方块半宽、字的视觉中心在基线上方几个字号
   TXT: { cap: '会赢的', b1: '两者皆有可能……', b2: '这就是答案。', say: '没错，是博丽灵梦赢了！', small: '【最强的战绩，铭刻于神社！】',
@@ -178,8 +178,8 @@ function s5Charm(c, ax, ay, o = {}) { const { L = S5.LC, s = 1, spin = 0, swing 
     stroke(c, [P(g - 120, 420, 4), P(g + 120, 20, 4)], { w: lw(40), color: K.paper, al: .12, seed: 246, smooth: false, taper: 0 });
     stroke(c, [P(g - 60, 420, 4), P(g + 180, 20, 4)], { w: lw(14), color: K.paper, al: .1, seed: 247, smooth: false, taper: 0 }); c.restore(); }
   // 钥匙圈（金属，双圈）
-  outline(c, M(p => P(p[0], p[1]), ellPts(0, 0, 24, 24, 0, 36)), { w: lw(4.4), color: K.paper, seed: 250 + sd });
-  outline(c, M(p => P(p[0], p[1]), ellPts(0, 0, 18.5, 18.5, 0, 30)), { w: lw(2), color: K.paper, al: .7, seed: 251 + sd });
+  outline(c, M(P, ellPts(0, 0, 24, 24, 0, 36)), { w: lw(4.4), color: K.paper, seed: 250 + sd });
+  outline(c, M(P, ellPts(0, 0, 18.5, 18.5, 0, 30)), { w: lw(2), color: K.paper, al: .7, seed: 251 + sd });
   return P(0, 214); }
 // s5Spin：第三格里挂件转的角度。先往回拧一下，一口气转一圈，冲过头一点，弹回正面
 function s5Spin(t) { const [a, b, e, d] = S5.SPIN; if (t < a) return 0; if (t < b) return -.4 * easeOut((t - a) / (b - a));
@@ -293,9 +293,9 @@ function s5Main(c, tau) { const t = twos(tau); setView(null); inkBg(c);
   caption(c, S5.TXT.cap, tau, S5.CAP[0], { t1: S5.CAP[1] }); }
 
 // ===================== 收尾：黑底白字的「赢」→ 黑点 =====================
-// 墨底从四边收成方块（纹理锚在画面原点，和 inkBg 一样，收的第一帧看不出接缝）；停住；方块连字缩成画面正中的黑点
+// 墨底从四边慢慢收成方块（先慢后快再慢，纸从四边一点点露出来，不闪；纹理锚在画面原点，和 inkBg 一样）；停住；方块连字缩成画面正中的黑点
 function s5End(c, tau) { const t = twos(tau), sd = tick(t, 8); setView(null); paperBg(c);
-  if (tau < S5.DOT[0]) { const u = sm(S5.BOX[0], S5.BOX[1], tau, easeOutQuint), R = S5.BOXR, x0 = lerp(-60, CX - R, u), x1 = lerp(W + 60, CX + R, u), y0 = lerp(-60, CY - R, u), y1 = lerp(H + 60, CY + R, u);
+  if (tau < S5.DOT[0]) { const u = sm(S5.BOX[0], S5.BOX[1], tau, easeIO), R = S5.BOXR, x0 = lerp(-60, CX - R, u), x1 = lerp(W + 60, CX + R, u), y0 = lerp(-60, CY - R, u), y1 = lerp(H + 60, CY + R, u);
     block(c, [[x0, y0], [x1, y0], [x1, y1], [x0, y1]], K.ink, { smooth: false, amp: 2.4, freq: 26, seed: 20 + sd, grain: 1, anchor: [0, 0] });
     s5YingAt(c, CX, CY, S5.YING); return; }
   // 先鼓一下，一口气缩下去，最后弹到正好 DOT_R（最后几帧的形、种子、纹理和 handoffDot 一样）
