@@ -392,7 +392,7 @@ function s3Prizes(c, t) { const { badge: bg, coin: cn } = S3, sd = tick(t);
   if (t < cn.t0) return; const u = t - cn.t0, fall = sm(0, .28, u, easeIn), y = lerp(cn.y - 260, cn.y, fall) - (u > .28 ? 26 * Math.sin(Math.PI * sm(.28, .44, u, v => v)) : 0);
   s3Coin(c, t, cn.x, y, cn.r, u < .5 ? u * 26 : 0); }
 // s3Sig：剪影旁的署名「@」
-function s3Sig(c, t) { const { x, y, t0 } = S3.sig; if (t < t0) return; zh(c, '@', x, y, { size: 96, align: 'center', weight: 500, p: writeP(t, t0, '@', .25), seed: 51, tilt: .01, jitter: .01 });
+function s3Sig(c, t) { const { x, y, t0 } = S3.sig, Z = S3.zoom; if (t < t0 || (t >= Z.in[0] && t < Z.out[1])) return;   // 推近期间不画：放大后「@」贴着瓶颈，像一个乱入的符号 zh(c, '@', x, y, { size: 96, align: 'center', weight: 500, p: writeP(t, t0, '@', .25), seed: 51, tilt: .01, jitter: .01 });
 }
 function s3Caption(c, tau) { caption(c, '帕秋莉的炼金工坊', tau, S3.cap[0], { t1: S3.cap[1] }); const t0 = S3.cap[0] + .5;
   if (tau > t0 && tau < S3.cap[1] + .1) { c.save(); resetT(c); zh(c, 'パチュリの錬金工房', 58, 196, { size: 32, color: K.g1, p: writeP(tau, t0, 'パチュリの錬金工房', .04), seed: 9, tilt: .01, jitter: .01 }); c.restore(); viewT(c); } }
