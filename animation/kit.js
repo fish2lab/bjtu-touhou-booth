@@ -197,14 +197,18 @@ function eyeLines(c, x, y, r, o = {}) { const { lid = 1, open = 0, look = [0, 0]
 
 // ===================== 段与段的交接画面 =====================
 // 相邻两段用同一张静止画面交接：前一段最后至少 0.1 秒、后一段最前至少 0.1 秒都只画这一张，拼起来看不出接缝。
-//   handoffBlack    纯墨底：2→3、4→5、6→7、7→1（循环回开头）
+//   handoffBlack    纯墨底：2→3、4→5、6→7
 //   handoffSukima   隙间月影的纸 #F7F6F4：1→2（三眼的隙间裂开后满屏是这张纸）
-//   handoffStream   暖白纸上一条横贯画面的灰墨小溪线：3→4（魔药倒出来流成小溪，雏祭从这条线开始）
+//   handoffStream   暖白纸上一条横贯画面的灰墨小溪线，在画面下三分之一（y≈720）：3→4（魔药流下来摊开成小溪，雏祭从这条线开始）
 //   handoffDot      暖白纸正中一个黑色圆点（半径 DOT_R）：5→6（会赢的收成一个黑点，红黑榜把它当第一张黑点贴纸）
+//   handoffDesk     第 1 段开头的空桌面（镜头 zoom 1.04，墨水瓶、茶杯印、糖、日记纸，笔还在画面外）：7→1（片尾的墨被钢笔吸回去，片头再滴下来）。
+//                   道具画在 1-sanyan.js 的 s1DeskProps 里；运行时所有脚本都已载入，所以这里可以直接调用
 const SUKIMA_PAPER = '#F7F6F4';
-const STREAM = Array.from({ length: 49 }, (_, k) => [-40 + k * 42, 640 + 16 * Math.sin(k * .55) + 8 * Math.sin(k * 1.3 + 1)]);
+const STREAM = Array.from({ length: 49 }, (_, k) => [-40 + k * 42, 720 + 16 * Math.sin(k * .55) + 8 * Math.sin(k * 1.3 + 1)]);
 function handoffBlack(c) { setView(null); inkBg(c); }
 function handoffSukima(c) { setView(null); resetT(c); c.fillStyle = SUKIMA_PAPER; c.fillRect(-10, -10, W + 20, H + 20); texture(c, null, 'paper', .35); }
 function handoffStream(c) { setView(null); paperBg(c); stroke(c, STREAM, { w: 10, color: K.g3, seed: 5, taper: 0, rough: .25 }); }
 const DOT_R = 34;
 function handoffDot(c) { setView(null); paperBg(c); block(c, ellPts(CX, CY, DOT_R, DOT_R, 0, 40), K.ink, { amp: 1.2, seed: 7, grain: .4 }); }
+const DESK_VIEW = { x: CX, y: CY, zoom: 1.04 };
+function handoffDesk(c) { setView(DESK_VIEW); paperBg(c); s1DeskProps(c); }

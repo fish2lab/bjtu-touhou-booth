@@ -55,10 +55,11 @@ function s1Spatter(c, x, y, R, k, seed) { if (k <= 0) return; const r = rng(seed
   block(c, ellPts(x + Math.cos(a) * d, y + Math.sin(a) * d, s, s * (.7 + r() * .5), a, 12), K.ink, { amp: s * .15, seed: seed + j, grain: 0 }); } }
 
 // ===================== 镜头 A：桌面 =====================
+// s1DeskProps：桌上不动的道具。handoffDesk（7→1 的交接画面）也画这一组，改道具时两边一起变
+function s1DeskProps(c) { s1Inkwell(c, 200, 880, 11); s1Ring(c, 1650, 860, 96, 21); s1Candy(c, 360, 250, -.35, 31); s1Slip(c, 1590, 250, .08, 41); }
 function s1Desk(c, tau) { const t = twos(tau), [bx, by] = S1.blot, splat = 1.55;
   const push = 1.04 + .04 * sm(0, 4.2, tau), dive = sm(4.2, 5.2, tau, easeIn), zoom = push * Math.pow(14, dive);
-  setView({ x: lerp(CX, bx, sm(3.6, 4.6, tau)), y: lerp(CY, by + 4, sm(3.6, 4.6, tau)), zoom }); paperBg(c);
-  s1Inkwell(c, 200, 880, 11); s1Ring(c, 1650, 860, 96, 21); s1Candy(c, 360, 250, -.35, 31); s1Slip(c, 1590, 250, .08, 41);
+  setView({ x: lerp(CX, bx, sm(3.6, 4.6, tau)), y: lerp(CY, by + 4, sm(3.6, 4.6, tau)), zoom }); paperBg(c); s1DeskProps(c);
   // 笔：0.2–0.8 从右上角进来，3.0 起抬走
   const inn = sm(.15, .85, t, easeOutQuint), out = sm(3, 3.8, t, easeIn), nib = [lerp(1500, 1000, inn) + out * 500, lerp(-300, 372, inn) - out * 700], a = -.95;
   // 墨滴：在笔尖长大，1.2 起下落，1.55 落到纸上
@@ -198,7 +199,8 @@ function s1Gap(c, tau) { const t = twos(tau), E = S1.E, dark = sm(E, E + .35, ta
   const bow = sm(.55, 1, u, easeOutBack) * (1 - open); if (bow > .01) { s1Bow(c, CX - half, cy - lift, 46 * bow, -1, 420 + sd); s1Bow(c, CX + half, cy - lift, 46 * bow, 1, 430 + sd); } }
 
 scene({ order: 1, key: 'sanyan', name: '三眼的幻恋', dur: S1.END, fn: (c, tau) => {
-  if (tau < S1.B) s1Desk(c, tau);
+  if (tau < .1) handoffDesk(c);
+  else if (tau < S1.B) s1Desk(c, tau);
   else if (tau < S1.C) s1Corridor(c, tau);
   else if (tau < S1.D) s1Vines(c, tau);
   else if (tau < S1.D + 1 / 12) { setView(null); inkBg(c); }

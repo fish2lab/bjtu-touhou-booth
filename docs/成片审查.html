@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>成片审查 2026-09-24</title>
+<style>
+  body { font: 17px/1.75 -apple-system, "PingFang SC", "Hiragino Sans GB", sans-serif; color: #1d1b18; background: #f3efe6; margin: 0; }
+  main { max-width: 1080px; margin: 0 auto; padding: 48px 32px 96px; }
+  h1 { font-size: 30px; margin: 0 0 6px; }
+  .meta { color: #6d675d; margin-bottom: 28px; }
+  h2 { font-size: 21px; margin: 44px 0 10px; padding-top: 18px; border-top: 2px solid #1d1b18; }
+  h2 .tag { display: inline-block; font-size: 13px; font-weight: 600; padding: 1px 8px; margin-right: 10px; vertical-align: 3px; border-radius: 3px; background: #1d1b18; color: #f3efe6; }
+  h2 .tag.add { background: #8a3b2e; }
+  p { margin: 8px 0; }
+  .k { font-weight: 600; }
+  code { font: 14px/1.4 Menlo, monospace; background: #e6e0d3; padding: 1px 5px; border-radius: 3px; }
+  img { display: block; max-width: 100%; margin: 12px 0 4px; border: 1px solid #c9c1b1; }
+  .box { background: #fffdf8; border: 1px solid #d8d0bf; padding: 14px 18px; margin: 14px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 15px; }
+  td, th { border: 1px solid #cfc7b6; padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: #e6e0d3; }
+</style>
+</head>
+<body><main>
+<h1>成片审查：你列的六条都在画面上找到了原因，另外还有五处要一起改</h1>
+<div class="meta">2026-09-24 · 审的是 <code>out/booth-4k.mp4</code>（128.4 秒，3840×2160，24fps）· 逐段抽帧，交接处按每秒 12 帧逐帧看</div>
+
+<div class="box">
+<p><span class="k">先说成片的来历。</span>这版片子是在 MIMO 的分支 <code>worktree-finish-scenes-345</code> 上渲染的，这个分支还没合进 main。它做的事是把三个中途停下的 Claude worktree 里的第 3、4、5 段原样搬过来，之后只改了一处字号（雏祭河边那行字调到 48）。所以第 3、4、5 段仍是当时 agent 停下时的半成品，下面第 4、5 条的问题都出在这里。main 上这三段现在还是占位文件。</p>
+<p><span class="k">没问题的部分。</span>红黑榜和笑话段的节奏、字号、盖章都完整，这次除了片尾回环，没发现要动的地方。</p>
+</div>
+
+<h2><span class="tag">你的第 1 条</span>走廊里的觉之瞳前 5 秒几乎不长，最后半秒才一口气胀满屏，所以看不出它是吃书吃大的</h2>
+<img src="../out/review/1-eye.jpg">
+<p><span class="k">原因。</span><code>1-sanyan.js</code> 的 <code>s1Corridor</code> 里，眼睛半径是 <code>62 + 吃掉的书数 × 2.6</code>，14 本书全吃完也只从 62 长到 98。镜头同时一直往前推，屏上看不出这点变化。真正的长大写在 10.35–11.15 秒的 <code>endGrow</code>，一下放大 27 倍，看上去是突然爆开。</p>
+<img src="../out/review/1-books.jpg">
+<p><span class="k">书没有立体感。</span><code>s1BookQuad</code> 只算了书脊那一个面，四个角都贴在同一面墙上，没有书顶，也没有书页那一侧的厚度，所以整排书读起来像白色窗格。飞出来的书一共 14 本，每本飞 0.55 秒，边飞边缩到原来的 0.15 倍，在画面里只有指甲盖大，看不到「被吸进去」。</p>
+<p><span class="k">线细。</span>地上那根线宽 4，眼皮线和睫毛也是这个量级，4K 上约 8 像素。27 寸屏站在 1.5 米外看，就是一根头发丝。</p>
+<p><span class="k">改法。</span>半径跟吃书数挂钩，从 60 长到 240 左右，每吞一本有一次「咕咚」：先压扁，再弹大一圈。书画成有书顶和书口的长方块，飞的时候翻滚、封面张开，沿螺旋线卷进眼睛，每本飞 0.8–1 秒，同时在空中的书越来越多，最后一整排被扯出来。主线条宽度翻倍（地上线 4 → 9，眼皮线、睫毛同比加粗）。</p>
+
+<h2><span class="tag">你的第 2 条</span>封面右沿贴着画框，文字块和封面也不在同一条中线上，所以版面往右挤、往上飘</h2>
+<img src="../out/review/2-cover.jpg">
+<p><span class="k">原因。</span><code>S1.cover</code> 中心 x 1585、宽 590，右沿在 1880，外面那圈描边到 1890，画框内沿约 1900，右边只剩 10 左右。左边文字从 x≈170 开始，左右边距差了十几倍。上下方向，文字块约 290–680（中心 485），封面 195–885（中心 540），中心差 55，顶边也不齐。</p>
+<p><span class="k">改法。</span>封面宽缩到 520 左右，右边留出和左边一样的边距（约 150）。文字块和封面共用一条水平中线，标题的顶和封面的顶对齐，文字块在左边剩下的空间里居中。</p>
+
+<h2><span class="tag">你的第 3 条</span>隙间月影 22 秒里画面基本不动，换作品是一帧硬切，所以接在走廊和蔷薇后面显得很空</h2>
+<img src="../out/review/3-cut.jpg">
+<p><span class="k">原因。</span><code>2-sukima.js</code> 按每幅的开始时刻直接换作品（<code>s2Idx</code>），34.92 → 35.00 秒左框的画和右栏的字同时消失、下一幅原作直接出现，中间没有任何过渡。四次换作品都是这样。</p>
+<img src="../out/review/3-static.jpg">
+<p>整段的动作只有两种：右栏逐字写出，和一道竖着扫过画框的细缝。镜头 22 秒不动，作品名到价格之间有 350 像素空着。前一段有镜头推进、书在飞、藤蔓在长，这里一下子全停了。</p>
+<p><span class="k">改法。</span>全片照《图画展览会》编排，这一段最适合拍成「画廊的一面墙」：四幅画挂在同一面墙上，镜头沿墙横移，走到一幅停下；紫的隙间从画面上撕开，两端系蝴蝶结，缝里是黑的、有几只眼睛；原作被隙间吞进去，东方版从缝里翻出来；画旁边一张展签卡片翻出来写四行字。换下一幅就是镜头继续横移，不再硬切。最后一道隙间张满屏，露出深色的价格页。手写字、暗紫、每幅四行字的内容都保留。</p>
+
+<h2><span class="tag">你的第 4 条</span>炼金最后的烧瓶只在原地放大 1.35 倍，倒出的药水 0.3 秒就切到白纸，小溪线一眨眼铺满，所以既没有特写也没有「流下来」</h2>
+<img src="../out/review/4-pour.jpg">
+<p><span class="k">原因。</span><code>3-alchemy.js</code> 的 <code>S3.push</code> 只把烧瓶原地放大到 1.35 倍，镜头没动，问号烟约占画面四分之一高。结尾的下摇写了，但 63.17 → 63.50 秒这 0.33 秒里整个吧台滑出画面，下面是一张空白纸，吧台和地面之间没有东西可以经过。落下的药水是一根细竖线，落地后横线 0.1 秒就铺满全宽，最后停在 y≈640（画面正中偏下，还没到下三分之一），之后近 1 秒不动。</p>
+<p><span class="k">改法。</span>8.3 秒起镜头推近到烧瓶（放大约 2.2 倍，烧瓶占画面一半高），问号烟一股一股冒出来，在瓶上方聚成大问号，停够再拉回来打钩。结尾照你说的四拍：烧瓶一歪，药水从台沿流下 → 镜头跟着液头往下走 1–1.5 秒，一路经过台板、台脚、地面 → 液头落到画面下三分之一（y≈720）摊开，向左右两边一直蔓延到画框 → 这条线就是交给雏祭的小溪。交接高度 <code>STREAM</code> 从 640 改到 720 附近，第 4 段开头「小溪拉直成尺子」的起点要一起改。</p>
+
+<h2><span class="tag">你的第 5 条</span>雏人偶的头直径只有肩宽的三成，所以看起来像一件衣服上顶了颗纽扣</h2>
+<img src="../out/review/5-doll.jpg">
+<p><span class="k">原因。</span><code>4-hina.js</code> 里 <code>S4HEADR = 22</code>，头直径 44；衣服 <code>S4ROBE</code> 肩宽 144、高 152。头宽约为肩宽的 0.3，头高占全身 22%。桌上做的、陈列台上的、船上的人偶都用这一套比例。</p>
+<p><span class="k">改法。</span>头半径加到 36–40，头宽约为肩宽一半，头高约占全身三分之一，接近雏人偶和小芥子的比例。<code>S4HEADV</code> 和头发 <code>S4HAIR</code> 跟着上移，衣服可以同时收窄一成。改一处，全段人偶一起变。</p>
+
+<h2><span class="tag">你的第 6 条</span>片尾睁眼后只有 1 帧黑场就跳回亮白的桌面，所以回环时像闪了一下，也没有形状接上</h2>
+<img src="../out/review/6-loop.jpg">
+<p><span class="k">原因。</span><code>7-jokes.js</code> 的片尾结束后只画 0.12 秒黑场，第 1 段第 0 帧直接是亮纸桌面，从全黑跳到全亮。落款「北交东方笑话集 发布」「北京交通大学」写完只停约 1.1 秒，低于施工文档定的「字数 × 0.12 + 1.5 秒」（10 个字要 2.7 秒）。</p>
+<p><span class="k">改法。</span>片头是「墨滴 → 墨团 → 闭着的觉之瞳」，片尾把这条路倒着走一遍：睁开的眼停够落款时间后慢慢闭上 → 满屏黑底往里收，收成桌面正中的一团墨（第 1 段 <code>S1.blot</code> 的位置）→ 钢笔伸进来把墨团吸回笔尖，抬出画面 → 正好是第 1 段第 0 帧的空桌面。这张空桌面写成 <code>kit.js</code> 里的交接函数 <code>handoffDesk</code>，两段共用。片长多 2 秒左右。</p>
+
+<h2><span class="tag add">补充 1</span>走廊的墨团胀满屏以后，有将近 1 秒纯黑，所以第 1 段在 11 秒处像卡住了</h2>
+<img src="../out/review/1-black.jpg">
+<p>11.0–11.9 秒画面全黑，藤蔓要到 12 秒才从底边冒头。改法：藤蔓提前 0.5 秒开始长，或者墨团胀满屏的同时就在黑里刮出第一根藤。</p>
+
+<h2><span class="tag add">补充 2</span>会赢的 → 红黑榜交接时，黑底在 94.5 秒直接换成白纸，所以这里也闪一下</h2>
+<img src="../out/review/x-flash.jpg">
+<p>方案写的是「黑底白字的赢缩成一个黑点」。现在是先切到白纸，再让黑方块缩小。改法：满屏黑底本身往里收成「赢」字方块，纸从四边露出来，这样没有跳变。</p>
+
+<h2><span class="tag add">补充 3</span>河面和纸一样灰、人偶比纸船还大，所以流雏这一镜读不出「水墨小溪」</h2>
+<p>见第 5 条的第二张图。纸船垫在衣服底下，装不下人偶；河面只是几道横线，没有方案里写的淡墨晕染；头上的「厄」字小而淡。改法：纸船放大到能装下人偶，河面加淡墨晕染和倒影，「厄」加深一级灰。和第 5 条一起改。</p>
+
+<h2><span class="tag add">补充 4</span>陈列台上的人偶变体大多是同一个轮廓，所以远看「各式各样的手作人偶」这个笑点出不来</h2>
+<p>代码里有 8 种变体（红绿反的、剪毛了的、画在卡纸上的、只有铁丝的、只有头的、双头的、缠胶带的、歪的），台上也都摆了。但除了火柴人和卡纸画，其余都是同一件红衣服的轮廓，加上头都一样小，差别要凑近才看得出。改法：先按第 5 条把头放大，再让变体在轮廓上拉开（大小差两倍、头的形状不同、有的趴着有的倒着）。</p>
+
+<h2><span class="tag add">补充 5</span>会赢的右格里挂链和亚克力挂件断开了</h2>
+<img src="../out/review/x-chain.jpg">
+<p>86.5 秒，链子下端和挂件的孔之间空了约 50 像素，像挂件浮在空中。改法：链子长度对到挂件的孔。</p>
+
+<h2>怎么分工改：先合并、先定两处交接，再开五个 worktree 并行</h2>
+<p>先把 <code>worktree-finish-scenes-345</code> 合进 main，清掉五个旧的 Claude worktree。再由主会话在 <code>kit.js</code> 里定两处交接：小溪线的新高度（约 720）和新的片尾片头交接画面 <code>handoffDesk</code>。之后五包互不改同一个文件：</p>
+<table>
+<tr><th>包</th><th>文件</th><th>改哪几条</th></tr>
+<tr><td>A 三眼</td><td><code>1-sanyan.js</code></td><td>第 1、2 条，补充 1，片头接 <code>handoffDesk</code></td></tr>
+<tr><td>B 隙间月影</td><td><code>2-sukima.js</code></td><td>第 3 条，按画廊横移重做</td></tr>
+<tr><td>C 炼金</td><td><code>3-alchemy.js</code></td><td>第 4 条（特写、流下来、下三分之一摊开）</td></tr>
+<tr><td>D 雏祭</td><td><code>4-hina.js</code></td><td>第 5 条，补充 3、4，开头尺子接新的小溪高度</td></tr>
+<tr><td>E 会赢的 + 笑话</td><td><code>5-win.js</code>、<code>7-jokes.js</code></td><td>第 6 条片尾，补充 2、5</td></tr>
+</table>
+<p>B 的改动最大，按新写一段估，其余四包都是在现有代码上改。</p>
+</main></body>
+</html>
