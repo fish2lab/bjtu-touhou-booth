@@ -7,11 +7,12 @@
 //   0.15–0.95   小溪线原地拉直（y = 720）、长出刻度，变成一把尺子，跳到桌边。俯拍的手工桌，和第 1 段开头的桌面呼应
 //   1.0–2.6     材料一样样滑进来，手写小字标名字；展签「雏 祭」
 //   3.0–7.5     说明书三步，定格动画式地一格格跳着做（每秒 6 格），右上角标 ①②③：
-//               ① 剪刀剪出红色外衣，绿色内衬垫到下面   ② 铁丝做支架、点白乳胶、白卡纸剪出头
-//               ③ 马克笔涂头发、在衣服上写祝福语（看不清的手写线）；展签换成「把祝福语写在人偶上」
+//               ① 剪刀剪出红裙子，白卡纸剪的荷叶边垫到下面   ② 铁丝做支架、点白乳胶、白卡纸剪出头
+//               ③ 绿色彩笔涂头发、贴上红蝴蝶结，马克笔在裙子上写祝福语（看不清的手写线）；展签换成「把祝福语写在人偶上」
+//               人偶全部照键山雏的样子做：红裙子、裙底白色荷叶边、绿头发（一绺垂到胸前用红蝴蝶结扎住）、头顶大红蝴蝶结
 //   7.5–8.33    做好的人偶在桌上跳两下，蹦出画面
-//   8.33–14.0   摊位上的阶梯陈列台：刚才那个人偶先落到台上，接着各式手作人偶一个个摆上来，远看轮廓就各不相同：
-//               0.6 到 1.7 倍大小，圆头、方头、椭圆头、大得离谱的头、很小的头，侧躺的、倒放的、歪着靠在大个子身上的，红绿反过来的；
+//   8.33–14.0   摊位上的阶梯陈列台：刚才那个人偶先落到台上，接着一个个手作的键山雏摆上来，远看轮廓就各不相同：
+//               0.6 到 1.7 倍大小，胖瘦 0.75 到 1.4，大头、小头，侧躺的、倒放的、歪着靠在大个子身上的；
 //               差别最大的放前排和正中，前排正中是那个特别大的规矩人偶；
 //               最高一层转台上转转玩偶在转（左下角署名 FUMO_CREDIT）；台边立着雏祭摊宣；右边一只手接过吧唧和决策币
 //   14.0–15.0   镜头往下摇：陈列台的台阶接上河岸的石阶，下面是水墨小溪（几层横向的淡墨晕染带，远岸深）
@@ -71,10 +72,13 @@ function s4Glue(c, x, y, rot, seed) { const T = tf(x, y, 1, rot), body = M(T, [[
 function s4Coil(c, x, y, seed) { for (let k = 0; k < 6; k++) stroke(c, ellPts(x + k * 3 - 8, y + k * 2 - 5, 58 - k * 1.5, 50 - k, .3, 40), { close: true, w: 2.2, color: K.g3, seed: seed + k, taper: 0, rough: .15 });
   stroke(c, [[x + 48, y + 22], [x + 80, y + 40], [x + 96, y + 34], [x + 114, y + 58]], { w: 2.4, color: K.g3, seed: seed + 9, taper: .2 }); }
 // s4Pens：三支彩笔（笔帽红、绿、黑）
-function s4Pens(c, x, y, rot, seed) { [K.vermil, K.moss, K.ink].forEach((col, k) => { const T = tf(x + (k - 1) * 8, y + (k - 1) * 32, 1, rot + (k - 1) * .04), body = M(T, rectPts(-112, -11, 172, 22));
-  block(c, body, K.card, { smooth: false, amp: .6, seed: seed + k * 5, grain: .4 }); outline(c, body, { w: 2.2, seed: seed + k * 5 + 1, smooth: false });
-  block(c, M(T, [[60, -13], [112, -13], [118, -7], [118, 7], [112, 13], [60, 13]]), col, { smooth: false, amp: .6, seed: seed + k * 5 + 2, grain: .5 });
-  block(c, M(T, [[-112, -8], [-126, -3], [-130, 0], [-126, 3], [-112, 8]]), col, { smooth: false, amp: .4, seed: seed + k * 5 + 3, grain: .3 }); }); }
+// s4Pen：一支彩笔，笔尖在局部 (-130, 0)
+function s4Pen(c, x, y, rot, col, seed) { const T = tf(x, y, 1, rot), body = M(T, rectPts(-112, -11, 172, 22));
+  block(c, body, K.card, { smooth: false, amp: .6, seed, grain: .4 }); outline(c, body, { w: 2.2, seed: seed + 1, smooth: false });
+  block(c, M(T, [[60, -13], [112, -13], [118, -7], [118, 7], [112, 13], [60, 13]]), col, { smooth: false, amp: .6, seed: seed + 2, grain: .5 });
+  block(c, M(T, [[-112, -8], [-126, -3], [-130, 0], [-126, 3], [-112, 8]]), col, { smooth: false, amp: .4, seed: seed + 3, grain: .3 }); }
+// s4Pens：三支彩笔（红、绿、黑）摆在一起；skip 那支拿去用了，不画
+function s4Pens(c, x, y, rot, seed, skip = null) { [K.vermil, K.moss, K.ink].forEach((col, k) => { if (col !== skip) s4Pen(c, x + (k - 1) * 8, y + (k - 1) * 32, rot + (k - 1) * .04, col, seed + k * 5); }); }
 // s4Tape：一卷胶带，拉出来一截
 function s4Tape(c, x, y, seed) { const outer = ellPts(x, y, 74, 70, 0, 44), inner = ellPts(x, y, 40, 38, 0, 32), tail = [[x + 66, y + 20], [x + 130, y + 42], [x + 124, y + 64], [x + 60, y + 42]];
   block(c, tail, K.g1, { smooth: false, amp: .8, seed: seed + 4, grain: .5 }); outline(c, tail, { w: 2, seed: seed + 5, smooth: false });
@@ -109,79 +113,74 @@ function s4Mat(c, key, x, y, rot, sd, o = {}) {
   else if (key === 'card') s4Card(c, x, y, 320, 240, rot, 51 + sd, o.hole, o.cutP);   // 头的洞半径 76（S4HEADR × DS），卡纸四边各留 40 以上
   else if (key === 'wire') s4Coil(c, x, y, 61 + sd);
   else if (key === 'glue') s4Glue(c, x, y, rot, 71 + sd);
-  else if (key === 'pens') s4Pens(c, x, y, rot, 81 + sd);
+  else if (key === 'pens') s4Pens(c, x, y, rot, 81 + sd, o.skip);
   else if (key === 'tape') s4Tape(c, x, y, 91 + sd);
   else if (key === 'marker') s4Marker(c, x, y, rot, 101 + sd); }
 
-// ===================== 雏人偶 =====================
-// 局部坐标：原点是下摆中点，向上是负。外衣是和服的样子：V 字领、两只宽袖垂下来；内衬比外衣大一圈，下摆和袖口露出一道绿边。
-// 比例照雏人偶和小芥子：肩宽 130、衣高 152；头半径 38，头宽约为肩宽的 0.58，头连头发约占全身高（229）的三分之一
-const S4ROBE = [[-14, -152], [14, -152], [40, -145], [66, -130], [72, -68], [42, -60], [50, 0], [-50, 0], [-42, -60], [-72, -68], [-66, -130], [-40, -145]].map(([u, v]) => [u * .9, v]);
-const S4LINING = S4ROBE.map(([u, v]) => [u * 1.1, v < -140 ? v + 4 : v + 9]);
-const S4NECK = [[-12.6, -152], [12.6, -152], [0, -106]];   // V 字领里露出来的内衬
-// 头：半径 S4HEADR，圆心 S4HEADV；头底 S4HEADB 比领口（v = -152）低约 8，压在领口上。别的头（大头、小头、椭圆头）都让头底落在同一处
+// ===================== 雏人偶（全部照键山雏的样子） =====================
+// 局部坐标：原点是下摆中点，向上是负。照 dairi 画的键山雏：红裙子（上身深一点，泡泡短袖），裙底一圈白色荷叶边；
+// 绿头发（齐刘海、两边垂到肩上，左边一绺垂到胸前，用小红蝴蝶结扎住），头顶一个大红蝴蝶结，边上一道白。
+// 仍是现场手工的做法：红纸剪裙子和蝴蝶结、白卡纸剪荷叶边和头、绿色彩笔涂头发、铁丝支架、马克笔写祝福语、点两只闭着的眼。
+// 比例照雏人偶和小芥子：衣高 152；头半径 38，头连头发约占全身高的三分之一。
+// 每个人偶的大小（倍数 s）、胖瘦（wf，只横向缩放衣服和荷叶边，0.75 瘦 ~ 1.4 胖）、头的大小（hk）不同
+const S4DRESS = [[-12, -152], [12, -152], [30, -148], [46, -139], [52, -124], [40, -116], [25, -110], [22, -100], [38, -72], [55, -44], [68, -18], [-68, -18], [-55, -44], [-38, -72], [-22, -100], [-25, -110], [-40, -116], [-52, -124], [-46, -139], [-30, -148]];
+const S4BODICE = [...S4DRESS.slice(0, 8), ...S4DRESS.slice(14)];   // 上身和袖子（腰线 v = -100 以上），颜色深一点
+// 裙底的白荷叶边：上沿藏在裙摆下面，下沿是 9 个往下鼓的小弧
+const S4FRILL = (() => { const out = [[-62, -26], [62, -26]], n = 9, hw = 74; for (let k = 0; k < n; k++) { const a = hw - k * 2 * hw / n, b = a - 2 * hw / n;
+  for (let j = k ? 1 : 0; j <= 4; j++) { const q = j / 4; out.push([lerp(a, b, q), -7 + 7 * Math.sin(Math.PI * q)]); } } return out; })();
+// 头：半径 S4HEADR，圆心 S4HEADV；头底 S4HEADB 比领口（v = -152）低约 8，压在领口上。大头、小头都让头底落在同一处
 const S4HEADR = 38, S4HEADV = -182, S4HEADB = S4HEADV + S4HEADR * 1.04;
-const S4HEADC = -70, S4TWK = .84, S4TWU = 34;   // 只有头的那种：头的圆心；双头：头的倍数（半径 32）、左右各挪多少
-// 头发：雏人偶的姬发式，齐刘海剪在圆心稍上，两边的直发垂到肩上。坐标以头的横半径 rx、竖半径 ry 为单位，头的圆心为原点
+// 头发：齐刘海剪在圆心稍上，两边的直发垂到肩上。坐标以头的横半径 rx、竖半径 ry 为单位，头的圆心为原点
 const S4HAIR = [[-1.18, 1.25], [-1.22, .1], [-1.12, -.56], [-.84, -.98], [-.36, -1.19], [.36, -1.19], [.84, -.98], [1.12, -.56], [1.22, .1], [1.18, 1.25], [.76, 1.25], [.76, -.1], [-.76, -.1], [-.76, 1.25]];
-const S4HAIRSQ = [[-1.14, 1.25], [-1.16, -1.1], [1.2, -1.2], [1.2, 1.25], [.78, 1.25], [.78, -.12], [-.74, -.08], [-.74, 1.25]];   // 方头配方的头发
-const S4FACESQ = [[-.91, -.88], [.95, -1], [1.05, .8], [-.86, .96]];                                                            // 剪歪了的方头
-// s4HeadGeo：头的大小和位置。k 头的倍数（1 = S4HEADR），shape 'round' 圆 | 'oval' 竖长的椭圆（小芥子那样）| 'square' 方；
-//   du 左右挪；cv 直接给圆心（省略 = 头底压在领口上）
-function s4HeadGeo(o = {}) { const { k = 1, shape = 'round', du = 0, cv = null } = o, r = S4HEADR * k, rx = shape === 'oval' ? r * .8 : r, ry = shape === 'oval' ? r * 1.32 : r * 1.04;
-  return { shape, rx, ry, cu: du, cv: cv === null ? S4HEADB - ry : cv }; }
+// s4HeadGeo：头的大小和位置。k 头的倍数（1 = S4HEADR）
+function s4HeadGeo(k = 1) { const rx = S4HEADR * k, ry = rx * 1.04; return { rx, ry, cu: 0, cv: S4HEADB - ry }; }
 // 铁丝支架：从头里伸下来（伸进头里约一半），穿过衣服，底下盘成一圈当底座
 const S4WIRE = (() => { const out = [[0, -188], [0, -100], [0, 4]]; for (let k = 0; k <= 26; k++) { const a = Math.PI / 2 + k / 26 * TAU * 1.3, r = 8 + k * 1.2; out.push([Math.cos(a) * r, 8 + Math.sin(a) * r * .22]); } return out; })();
-// 祝福语：四行看不清的手写线（一串连笔的小圈），写在前襟上，不写具体内容
-const S4WISH = [[-27, 27, -96], [-30, 29, -74], [-32, 24, -52], [-34, 30, -30]];
+// 祝福语：四行看不清的手写线（一串连笔的小圈），写在裙子前面，不写具体内容
+const S4WISH = [[-20, 20, -84], [-27, 26, -66], [-33, 31, -48], [-39, 37, -30]];
 function s4Wishes(c, T, p, seed, lw) { S4WISH.forEach(([a, b, v], k) => { const q = clamp(p * S4WISH.length - k, 0, 1); if (q <= 0) return; const pts = [];
   for (let j = 0; j <= 40; j++) { const f = j / 40, ph = f * 44 + k * 1.7, amp = .55 + .45 * Math.sin(f * 9 + k * 2); pts.push([lerp(a, b, f) - 3.2 * Math.cos(ph), v + 4.4 * Math.sin(ph) * amp - 2 * Math.sin(f * 5 + k)]); }
   stroke(c, M(T, pts), { w: lw * .7, color: K.ink, p: q, seed: seed + k, taper: .15, rough: .15 }); }); }
-// s4ZigRing：剪得毛毛糙糙的轮廓（花边剪刀那样的锯齿）
-function s4ZigRing(pts, amp, seed) { const q = densify(pts, 7, true); return q.map((p, k) => { const a = q[(k + q.length - 1) % q.length], b = q[(k + 1) % q.length], tx = b[0] - a[0], ty = b[1] - a[1], l = Math.hypot(tx, ty) || 1, d = (k % 2 ? amp : -amp * .3) * (.6 + .8 * hash(k, seed));
-  return [p[0] + ty / l * d, p[1] - tx / l * d]; }); }
-// s4Head：白卡纸剪的头 + 马克笔涂的头发。hair 0..1 头发涂到哪（从上往下）。o 见 s4HeadGeo
-function s4Head(c, T, s, sd, hair = 1, o = {}) { const g = s4HeadGeo(o), lw = s4Lw(s), sq = g.shape === 'square', H = (u, v) => T(g.cu + u * g.rx, g.cv + v * g.ry);
-  const face = M(H, sq ? S4FACESQ : ellPts(0, 0, 1, 1, 0, 30));
-  block(c, face, K.card, { smooth: !sq, amp: .6, seed: sd, grain: .3 }); outline(c, face, { w: lw * .9, seed: sd + 1, smooth: !sq });
-  if (hair <= 0) return; const hp = M(H, sq ? S4HAIRSQ : S4HAIR);
-  if (hair >= 1) { block(c, hp, K.ink, { smooth: false, amp: .7, seed: sd + 2, grain: .4 }); return; }
-  const [, yTop] = H(0, -1.3), [, yBot] = H(0, 1.25); c.save(); c.beginPath(); c.rect(-1e4, yTop, 2e4, (yBot - yTop) * hair); c.clip(); block(c, hp, K.ink, { smooth: false, amp: .7, seed: sd + 2, grain: .4 }); c.restore(); }
-// 画在卡纸上的那种：卡纸的外框
-const S4DRAWNCARD = [[-66, 4], [66, 4], [64, -214], [-64, -212]];
-// s4DollTop：人偶最高点（头发顶）的 v，飘「厄」、倒放时用
-function s4DollTop(kind, hk = 1, hshape = 'round') { if (kind === 'drawn') return -214;
-  const g = s4HeadGeo(kind === 'head' ? { cv: S4HEADC } : kind === 'twins' ? { k: S4TWK } : { k: hk, shape: hshape }); return g.cv - 1.19 * g.ry; }
-// s4Doll：一个手作雏人偶。(x, y) 下摆中点，s 倍数。kind 是样子：
-//   neat 规规矩矩的（红外衣、绿内衬、白卡纸头、铁丝底座）  inv 红绿反过来  cut 剪得毛糙、头是方的  drawn 在白卡纸上用彩笔画的
-//   wire 只做了铁丝支架和头，忘了穿衣服  head 只有一个头  twins 一件衣服两个头  tape 胶带缠得太多
-//   hk 头的倍数（大头、小头），hshape 头形 'round' | 'oval' | 'square'（cut 默认方头）
-//   parts 控制各部件（桌上一步步做时用）：{ wire, lining, robe, head, hair, wishes, glue }
-function s4Doll(c, x, y, s, o = {}) { const { rot = 0, seed = 1, kind = 'neat', parts = null, hk = 1, hshape = kind === 'cut' ? 'square' : 'round' } = o, T = tf(x, y, s, rot), lw = s4Lw(s), sd = seed;
+// s4Head：白卡纸剪的头 + 绿色彩笔涂的头发。hair 0..1 头发涂到哪（从上往下）；k 头的倍数
+function s4Head(c, T, s, sd, hair = 1, k = 1) { const g = s4HeadGeo(k), lw = s4Lw(s), H = (u, v) => T(g.cu + u * g.rx, g.cv + v * g.ry);
+  const face = M(H, ellPts(0, 0, 1, 1, 0, 30));
+  block(c, face, K.card, { amp: .6, seed: sd, grain: .3 }); outline(c, face, { w: lw * .9, seed: sd + 1 });
+  if (hair <= 0) return; const hp = M(H, S4HAIR), paint = () => { block(c, hp, K.moss, { smooth: false, amp: .7, seed: sd + 2, grain: .5 }); outline(c, hp, { w: lw * .8, seed: sd + 3, smooth: false }); };
+  if (hair >= 1) { paint(); return; }
+  const [, yTop] = H(0, -1.3), [, yBot] = H(0, 1.25); c.save(); c.beginPath(); c.rect(-1e4, yTop, 2e4, (yBot - yTop) * hair); c.clip(); paint(); c.restore(); }
+// s4Lock：胸前那一绺头发，从左边的鬓发下面垂到胸前，再收到腰上
+function s4Lock(c, T, s, g, sd, lw) { const hu = g.cu - g.rx * .9, hv = g.cv + g.ry * .75, pts = M(T, [[hu, hv], [lerp(hu, -20, .5), lerp(hv, -142, .6)], [-17, -134], [-15, -118], [-10, -100]]);
+  stroke(c, pts, { w: 13 * s + lw * 2, color: K.ink, seed: sd, taper: .5, rough: .1 }); stroke(c, pts, { w: 13 * s, color: K.moss, seed: sd + 1, taper: .5, rough: .1 }); }
+// s4HinaBow：红纸剪的蝴蝶结。(cu, cv) 结的中心（人偶局部坐标），r 大小，a 转角；trim 两个圈边上一道白（头顶那个大的）
+const S4BOWL = [[0, 0], [-.35, -.42], [-.9, -.62], [-1.12, -.12], [-.9, .42], [-.35, .3]];
+const S4BOWT = [[-.08, .08], [-.5, .95], [-.28, 1.05], [.02, .22]];
+function s4HinaBow(c, T, cu, cv, r, a, sd, lw, trim = false) { const ca = Math.cos(a), sa = Math.sin(a), B = (u, v) => T(cu + (u * ca - v * sa) * r, cv + (u * sa + v * ca) * r), fl = p => p.map(([u, v]) => [-u, v]);
+  for (const tl of [S4BOWT, fl(S4BOWT).map(([u, v]) => [u * .9, v * .92])]) { const p = M(B, tl); block(c, p, S4RED.dk, { smooth: false, amp: .5, seed: sd, grain: .4 }); outline(c, p, { w: lw * .7, seed: sd + 1, smooth: false }); }
+  for (const lp of [S4BOWL, fl(S4BOWL)]) { const p = M(B, lp); block(c, p, K.vermil, { smooth: false, amp: .5, seed: sd + 2, grain: .5 }); outline(c, p, { w: lw * .8, seed: sd + 3, smooth: false });
+    if (trim) stroke(c, M(B, lp.slice(1, 5).map(([u, v]) => [u * .78, v * .78])), { w: lw * .6, color: K.card, seed: sd + 4, taper: .3 }); }
+  const kn = M(B, ellPts(0, 0, .2, .24, 0, 12)); block(c, kn, S4RED.dk, { amp: .3, seed: sd + 5, grain: .3 }); outline(c, kn, { w: lw * .7, seed: sd + 6 }); }
+// 头顶大蝴蝶结的位置（头的单位）和大小
+const S4TOPBOW = { u: .25, v: -1.08, r: .8, a: -.15 };
+// s4DollTop：人偶最高点（头顶蝴蝶结的顶）的 v，飘「厄」、倒放时用
+function s4DollTop(hk = 1) { const g = s4HeadGeo(hk); return g.cv - 1.66 * g.ry; }
+// s4Doll：一个手作的键山雏人偶。(x, y) 下摆中点，s 倍数；wf 胖瘦；hk 头的倍数。
+//   parts 控制各部件（桌上一步步做时用）：{ wire, lining（白荷叶边）, robe（红裙子）, head, hair（头发涂到哪；涂满后贴上两个蝴蝶结、垂下胸前那绺）, wishes, glue }
+function s4Doll(c, x, y, s, o = {}) { const { rot = 0, seed = 1, parts = null, hk = 1, wf = 1 } = o, T = tf(x, y, s, rot), W = (u, v) => T(u * wf, v), lw = s4Lw(s), sd = seed;
   const P = { wire: 1, lining: 1, robe: 1, head: 1, hair: 1, wishes: 1, glue: 0, ...(parts || {}) };
-  let red = K.vermil, green = K.moss; if (kind === 'inv') [red, green] = [green, red];
-  if (kind === 'head') { stroke(c, M(T, [[0, 0], [0, -40], [-4, -60]]), { w: lw * .9, color: K.g3, seed: sd + 1, taper: .1 }); s4Head(c, T, s, sd + 40, 1, { cv: S4HEADC }); return; }
-  if (kind === 'drawn') { const card = M(T, S4DRAWNCARD); block(c, card, K.card, { smooth: false, amp: .6, seed: sd, grain: .4 }); outline(c, card, { w: lw * .9, seed: sd + 1, smooth: false });
-    const D = (u, v) => T(u * .82, v * .82 - 12), hr = S4HEADR, hry = S4HEADR * 1.04;   // 画在卡纸上的人偶比真的小一圈
-    outline(c, M(D, S4ROBE), { w: lw * 1.1, color: K.vermil, seed: sd + 2, smooth: false, dry: .15 });
-    stroke(c, M(D, [S4NECK[0], S4NECK[2], S4NECK[1]]), { w: lw * 1.1, color: K.moss, seed: sd + 3, smooth: false });
-    outline(c, M(D, ellPts(0, S4HEADV, hr, hry, 0, 24)), { w: lw * .9, seed: sd + 4 });
-    outline(c, M(D, S4HAIR.map(([u, v]) => [u * hr, S4HEADV + v * hry])), { w: lw * 1.3, seed: sd + 5, smooth: false });
-    for (let k = 0; k < 3; k++) stroke(c, M(T, [[-24 + k * 5, -70 + k * 14], [-6 + k * 5, -74 + k * 14], [10 + k * 5, -70 + k * 14]]), { w: lw * .8, color: K.moss, seed: sd + 6 + k }); return; }
-  if (P.wire > 0) { const wp = kind === 'wire' ? [[0, -188], [0, -60], [0, 4], ...S4WIRE.slice(3)] : S4WIRE; stroke(c, M(T, wp), { w: lw * (s > 1.5 ? 1.3 : .85), color: K.g3, seed: sd + 1, p: P.wire, taper: .05, rough: .15 }); }
-  if (kind === 'wire') { stroke(c, M(T, [[-47, -96], [-22, -128], [0, -136], [22, -128], [45, -92]]), { w: lw * .85, color: K.g3, seed: sd + 2, taper: .05 });
-    stroke(c, M(T, [[0, -60], [-24, -4]]), { w: lw * .85, color: K.g3, seed: sd + 3, taper: .05 }); stroke(c, M(T, [[0, -60], [22, -2]]), { w: lw * .85, color: K.g3, seed: sd + 4, taper: .05 });
-    s4Head(c, T, s, sd + 40, 1, { k: hk, shape: hshape }); return; }
-  const twin = kind === 'twins', RB = twin ? S4ROBE.map(([u, v]) => [u * 1.25, v]) : S4ROBE, LN = twin ? S4LINING.map(([u, v]) => [u * 1.25, v]) : S4LINING;
-  if (P.lining > 0 && kind !== 'cut') { block(c, M(T, LN), green, { smooth: false, amp: .8, seed: sd + 5, grain: .6 }); outline(c, M(T, LN), { w: lw * .8, seed: sd + 6, smooth: false }); }
-  if (P.robe > 0) { const rp = kind === 'cut' ? s4ZigRing(RB, 5, sd) : RB; block(c, M(T, rp), red, { smooth: false, amp: kind === 'cut' ? .3 : .8, seed: sd + 7, grain: .6 });
-    if (kind !== 'cut') { block(c, M(T, S4NECK), green, { smooth: false, amp: .5, seed: sd + 8, grain: .4 }); stroke(c, M(T, [S4NECK[0], S4NECK[2], S4NECK[1]]), { w: lw * .7, seed: sd + 9, smooth: false }); }
-    outline(c, M(T, rp), { w: lw * .9, seed: sd + 10, smooth: false }); stroke(c, M(T, [[-38, -60], [-40, -118]]), { w: lw * .6, seed: sd + 11, al: .7 }); stroke(c, M(T, [[38, -60], [40, -118]]), { w: lw * .6, seed: sd + 12, al: .7 }); }
+  if (P.wire > 0) stroke(c, M(T, S4WIRE), { w: lw * (s > 1.5 ? 1.3 : .85), color: K.g3, seed: sd + 1, p: P.wire, taper: .05, rough: .15 });
+  if (P.lining > 0) { const fr = M(W, S4FRILL); block(c, fr, K.card, { smooth: false, amp: .6, seed: sd + 5, grain: .4 }); outline(c, fr, { w: lw * .8, seed: sd + 6, smooth: false });
+    for (let k = 1; k < 9; k++) { const u = 74 - k * 148 / 9; stroke(c, M(W, [[u, -17], [u * 1.02, -8]]), { w: lw * .55, seed: sd + 60 + k, smooth: false, al: .8 }); } }
+  if (P.robe > 0) { const dr = M(W, S4DRESS); block(c, dr, K.vermil, { smooth: false, amp: .8, seed: sd + 7, grain: .6 }); block(c, M(W, S4BODICE), S4RED.dk, { smooth: false, amp: .6, seed: sd + 8, grain: .5 });
+    outline(c, dr, { w: lw * .9, seed: sd + 10, smooth: false }); stroke(c, M(W, [[-22, -100], [22, -100]]), { w: lw * .6, seed: sd + 9, smooth: false, al: .8 });
+    stroke(c, M(W, [[-9, -96], [-26, -24]]), { w: lw * .6, seed: sd + 11, al: .6 }); stroke(c, M(W, [[9, -96], [26, -24]]), { w: lw * .6, seed: sd + 12, al: .6 }); }
   if (P.wishes > 0) s4Wishes(c, T, P.wishes, sd + 20, lw);
-  if (kind === 'tape') for (let k = 0; k < 4; k++) { const v = -128 + k * 34, a = (k % 2 ? .22 : -.18), tp = M(tf(...T(0, v), s, rot + a), rectPts(-70, -8, 140, 16)); block(c, tp, K.g1, { smooth: false, amp: .5, seed: sd + 30 + k, grain: .5, al: .92 }); outline(c, tp, { w: lw * .6, seed: sd + 34 + k, smooth: false }); }
   if (P.glue > 0) block(c, M(T, ellPts(2, -155, 9, 7, .3, 14)), K.card, { amp: 1.2, seed: sd + 38, grain: .2 });
-  if (P.head > 0) { if (twin) { s4Head(c, T, s, sd + 40, P.hair, { k: S4TWK, du: -S4TWU }); s4Head(c, T, s, sd + 44, P.hair, { k: S4TWK, du: S4TWU }); }
-    else s4Head(c, T, s, sd + 40, P.hair, { k: hk, shape: hshape }); } }
+  if (P.head <= 0) return; const g = s4HeadGeo(hk), done = P.hair >= 1;
+  if (done) s4Lock(c, T, s, g, sd + 50, lw);
+  s4Head(c, T, s, sd + 40, P.hair, hk);
+  // 闭着的两只眼（照参考图里眯眼笑的样子，也和觉之瞳闭眼呼应），头发涂满后用马克笔点上
+  if (done) for (const d of [-1, 1]) stroke(c, M((u, v) => T(g.cu + u * g.rx, g.cv + v * g.ry), [[d * .36 - .17, .38], [d * .36, .25], [d * .36 + .17, .38]]), { w: lw * .75, seed: sd + 80 + d, taper: .3 });
+  if (done) { s4HinaBow(c, T, -15, -140, 13, .2, sd + 54, lw); const B = S4TOPBOW; s4HinaBow(c, T, g.cu + g.rx * B.u, g.cv + g.ry * B.v, g.rx * B.r, B.a, sd + 70, lw, true); } }
 
 // ===================== 镜头 A、B：手工桌 =====================
 // 尺子：小溪线拉直、收短，长出尺身和刻度，再跳到桌子下边
@@ -201,29 +200,29 @@ function s4Make(c, tau, sd) { const f = s4F(tau), t = twos(tau), [ox, oy] = S4.D
   // ② 铁丝：先是一截直的（线圈旁边），再弯成支架的样子，最后贴到人偶背后
   if (f === 27) stroke(c, [[1580, 540], [1480, 470], [1360, 400]], { w: lw * 1.3, color: K.g3, seed: 150 + sd, taper: .05 });
   if (f === 28) stroke(c, M(tf(1270, 720, s * .9, -.35), S4WIRE), { w: lw * 1.3, color: K.g3, seed: 151 + sd, taper: .05 });
-  // ① 红纸：滑到桌子中间；剪刀沿外衣的轮廓剪；剩下的纸框跳开
+  // ① 红纸：滑到桌子中间；剪刀沿裙子的轮廓剪；剩下的纸框跳开
   if (f >= 18 && f < 26) { const k = f === 18 ? .5 : 1, w0 = home('washi'), sx = lerp(w0.x, S4SHEET.x, k), sy = lerp(w0.y, S4SHEET.y, k), rot = lerp(w0.rot, S4SHEET.rot, k);
     if (f < 24) { s4Washi(c, sx, sy, S4SHEET.w, S4SHEET.h, rot, K.vermil, 160 + sd);
-      // 说明书式的剪切虚线：沿外衣轮廓一段段的浅色短划
-      if (f >= 19) { const ring = densify(M(T, S4ROBE), 3, true); let acc = 0, seg = []; for (let j = 1; j <= ring.length; j++) { const a = ring[j - 1], b = ring[j % ring.length]; acc += Math.hypot(b[0] - a[0], b[1] - a[1]);
+      // 说明书式的剪切虚线：沿裙子轮廓一段段的浅色短划
+      if (f >= 19) { const ring = densify(M(T, S4DRESS), 3, true); let acc = 0, seg = []; for (let j = 1; j <= ring.length; j++) { const a = ring[j - 1], b = ring[j % ring.length]; acc += Math.hypot(b[0] - a[0], b[1] - a[1]);
         if (acc % 26 < 15) seg.push(b); else if (seg.length) { if (seg.length > 1) stroke(c, seg, { w: 3.2, color: K.card, seed: 165 + j, taper: .2, smooth: false, al: .9 }); seg = []; } }
         if (seg.length > 1) stroke(c, seg, { w: 3.2, color: K.card, seed: 166, taper: .2, smooth: false, al: .9 }); } }
     else { const far = f === 25, Tw = tf(S4SHEET.x - (far ? 520 : 260), S4SHEET.y - (far ? 60 : 120), 1, far ? -1.1 : -.5), frame = new Path2D(); frame.addPath(polyPath(rough(M(Tw, rectPts(-S4SHEET.w / 2, -S4SHEET.h / 2, S4SHEET.w, S4SHEET.h)), { amp: 1.8, seed: 161 + sd, smooth: false })));
-      frame.addPath(polyPath(M(Tw, S4ROBE.map(([u, v]) => [(u) * s, (v + 76) * s])).reverse())); c.save(); c.fillStyle = K.vermil; c.fill(frame, 'evenodd'); texture(c, frame, 'ink', .6); c.restore(); } }
-  // 绿内衬：先剪好了放在一边（定格动画跳过了剪的过程），下一格垫到外衣下面
+      frame.addPath(polyPath(M(Tw, S4DRESS.map(([u, v]) => [(u) * s, (v + 76) * s])).reverse())); c.save(); c.fillStyle = K.vermil; c.fill(frame, 'evenodd'); texture(c, frame, 'ink', .6); c.restore(); } }
+  // 白荷叶边：先剪好了放在一边（定格动画跳过了剪的过程），下一格垫到裙子下面
   if (f === 25) s4Doll(c, 1300, 640, s * .9, { rot: .25, seed: 170, parts: { wire: 0, robe: 0, head: 0, wishes: 0, lining: 1 } });
-  // 人偶本体（外衣剪出来以后）
+  // 人偶本体（裙子剪出来以后）
   const lift = f === 26 ? 1.05 : 1;
   if (robeOn || parts.wire) pop(c, ox, oy - 76 * s, lift, () => s4Doll(c, ox, oy, s, { seed: 180 + sd % 5, parts }));
   // 剪的时候：轮廓上的剪口一格格往前走，剪刀跟着
-  if (f >= 19 && f < 24) { const ring = M(T, S4ROBE), path = [...ring, ring[0]], cp = (f - 19) / 4; if (cp > 0) stroke(c, path, { w: 3.6, p: cp, seed: 190 + sd, taper: 0, smooth: false });
+  if (f >= 19 && f < 24) { const ring = M(T, S4DRESS), path = [...ring, ring[0]], cp = (f - 19) / 4; if (cp > 0) stroke(c, path, { w: 3.6, p: cp, seed: 190 + sd, taper: 0, smooth: false });
     const at = pathAt(path, cp); s4Scissors(c, at.x - Math.cos(at.a) * 150, at.y - Math.sin(at.a) * 150, at.a, f % 2 ? .08 : .42, 200 + sd); }
   // ② 白乳胶：跳到脖子旁边挤一点，再跳回去
   if (f === 30) s4Glue(c, ox + 150, oy - 152 * s - 60, 2.76, 210 + sd);
   // ② 头：卡纸上先剪出一个圈，下一格头飞在半空，再下一格落到脖子上
   if (f === 32) { const [hx, hy] = T(0, S4HEADV); s4Head(c, tf(lerp(330, hx, .55), lerp(740, hy, .55) - 120 - S4HEADV * s * 1.15, s * 1.15), s * 1.15, 220, 0); }
-  // ③ 马克笔：先到头上涂头发，再到衣服上写祝福语
-  if (f >= 36 && f < 39) { const [hx, hy] = T(14, -214 + (f - 36) * 24); s4Marker(c, hx, hy, -.75, 230 + sd); }
+  // ③ 绿色彩笔到头上涂头发（笔尖落在头发上，笔身朝右上），涂满后贴上蝴蝶结；再换马克笔到裙子上写祝福语
+  if (f >= 36 && f < 39) { const [hx, hy] = T(14, -214 + (f - 36) * 24), th = Math.PI - .75; s4Pen(c, hx + 130 * Math.cos(th), hy + 130 * Math.sin(th), th, K.moss, 230 + sd); }
   if (f >= 39 && f < 44) { const p = parts.wishes, k = Math.min(S4WISH.length - 1, Math.floor(p * S4WISH.length)), [a, b, v] = S4WISH[k], u = clamp(p * S4WISH.length - k, 0, 1), [mx, my] = T(lerp(a, b, u), v);
     s4Marker(c, mx, my, -.8 + .06 * Math.sin(t * 20), 240 + sd); } }
 // 桌面（镜头 A 和 B）。材料在四周，人偶在中间做
@@ -232,15 +231,15 @@ function s4Table(c, tau) { const t = twos(tau), f = s4F(tau), sd = tick(t); setV
   if (tau >= .8) { stroke(c, ellPts(1650, 860, 96, 93, 0, 60), { close: true, w: 8, dry: .55, seed: 21, al: .6, taper: 0 }); stroke(c, ellPts(1656, 856, 89, 86, 0, 60).slice(8, 40), { w: 3, dry: .5, seed: 22, al: .4 }); }
   s4RulerNow(c, tau, sd);
   if (tau >= .9) zh(c, '尺子', 1430, 990, { size: 34, color: K.g3, p: writeP(t, 1.0, '尺子', .05), seed: 9, tilt: .01, jitter: .01, al: tau < S4.STEP[2] ? 1 : 0 });
-  const away = { scissors: f >= 19 && f < 24, glue: f === 30, marker: f >= 36 && f < 44 };
+  const away = { scissors: f >= 19 && f < 24, glue: f === 30, marker: f >= 39 && f < 44 };
   for (const m of S4MAT) { if (away[m.key]) continue; const u = sm(m.t, m.t + .25, t, easeOutQuint); if (u <= 0) continue;
-    s4Mat(c, m.key, lerp(m.from[0], m.x, u), lerp(m.from[1], m.y, u), m.rot, sd, m.key === 'card' ? { hole: [8, -6, S4HEADR * S4.DS], cutP: f >= 32 ? 1 : f === 31 ? 1 - 1e-3 : 0 } : {});
+    s4Mat(c, m.key, lerp(m.from[0], m.x, u), lerp(m.from[1], m.y, u), m.rot, sd, m.key === 'card' ? { hole: [8, -6, S4HEADR * S4.DS], cutP: f >= 32 ? 1 : f === 31 ? 1 - 1e-3 : 0 } : m.key === 'pens' ? { skip: f >= 36 && f < 39 ? K.moss : null } : {});
     if (tau < S4.STEP[2]) zh(c, m.label, m.lx, m.ly, { size: 34, color: K.g3, p: writeP(t, m.t + .15, m.label, .05), seed: 11 + m.t * 10, tilt: .01, jitter: .01 }); }
   if (tau >= S4.STEP[0]) {
     // 做好以后：跳两下，蹦出画面（f 45–49）
     if (f >= 45) { const [ox, oy] = S4.DOLL, s = S4.DS, k = [1.12, 1, 1.12, 1.5, 2.3][f - 45] || 0, dy = [-10, 0, -10, -240, -800][f - 45] || 0;
-      // 跳起来时桌上留一块外衣形状的淡影子；最后一格蹦出画面，影子也没了
-      if (k > 1 && f < 49) block(c, M(tf(ox + 16 * k, oy + 14 * k, s), S4ROBE), K.g1, { smooth: false, amp: 1, seed: 250, grain: .4, al: .55 });
+      // 跳起来时桌上留一块裙子形状的淡影子；最后一格蹦出画面，影子也没了
+      if (k > 1 && f < 49) block(c, M(tf(ox + 16 * k, oy + 14 * k, s), S4DRESS), K.g1, { smooth: false, amp: 1, seed: 250, grain: .4, al: .55 });
       if (k > 0) pop(c, ox, oy - 76 * s, k, () => s4Doll(c, ox, oy + dy, s, { seed: 180 + sd % 5 })); }
     else s4Make(c, tau, sd);
     const n = tau < S4.STEP[1] ? 1 : tau < S4.STEP[2] ? 2 : 3; if (tau < S4.DONE) s4No(c, n, tau, S4.STEP[n - 1], sd); } }
@@ -248,34 +247,34 @@ function s4Table(c, tau) { const t = twos(tau), f = s4F(tau), sd = tick(t); setV
 // ===================== 镜头 C：阶梯陈列台 =====================
 // 五层台阶（最上一层是转台）：台面 y、半宽。台面铺一条红毡，台身是木刻的墨块
 const S4TIER = [{ y: 372, hw: 150 }, { y: 505, hw: 250 }, { y: 638, hw: 345 }, { y: 771, hw: 430 }, { y: 904, hw: 505 }];
-// 台上的手作人偶：层 k、x、样子 kind、倍数 s、摆上来的时刻 t；hk 头的倍数、hshape 头形；
+// 台上的手作人偶（全是键山雏）：层 k、x、倍数 s、胖瘦 wf、摆上来的时刻 t；hk 头的倍数；
 //   pose 'lie' 侧躺（dir 1 头朝右）、'flip' 倒着放（头顶着台面）；lean 歪着靠在旁边的人偶身上（弧度，负数往左歪）。第一个是桌上刚做好的那个。
-// 远看轮廓要一眼不同：差别最大的放前排（第 4 层）和正中——倒放的、大得离谱的头、侧躺的、特别大的规矩人偶、歪靠在它身上的、很小的头；
-//   第 3 层正中是红绿反过来的椭圆头。后排是剪的方头、画的、只有头的、铁丝的、双头的、小的。倍数从 0.6 到 1.7
+// 远看轮廓要一眼不同：差别最大的放前排（第 4 层）和正中——倒放的、大头的、侧躺的胖子、特别大的、歪靠在它身上的瘦子、小头的；
+//   其余几层胖瘦大小交错。倍数从 0.6 到 1.7，胖瘦从 0.75 到 1.4
 const S4SHELF = [
-  { k: 1, x: 870, kind: 'neat', s: .8, t: 8.4, seed: 180, first: true },
-  { k: 2, x: 830, kind: 'drawn', s: .8, t: 8.7, seed: 300 },
-  { k: 3, x: 690, kind: 'cut', s: .8, t: 8.95, seed: 310 },
-  { k: 3, x: 915, kind: 'inv', s: .95, t: 9.2, seed: 320, hshape: 'oval' },
-  { k: 2, x: 1005, kind: 'head', s: .8, t: 9.45, seed: 410 },
-  { k: 2, x: 1290, kind: 'wire', s: .8, t: 9.7, seed: 330 },
-  { k: 3, x: 1330, kind: 'twins', s: .85, t: 9.95, seed: 340 },
-  { k: 4, x: 757, kind: 'neat', s: .8, t: 10.2, seed: 350, hk: 1.9 },
-  { k: 1, x: 1215, kind: 'neat', s: .65, t: 10.45, seed: 370, hshape: 'square' },
-  { k: 4, x: 617, kind: 'neat', s: .8, t: 10.7, seed: 360, pose: 'flip' },
-  { k: 4, x: 845, kind: 'tape', s: .7, t: 10.95, seed: 390, pose: 'lie', dir: 1 },
-  { k: 4, x: 1460, kind: 'neat', s: .95, t: 11.2, seed: 380, hk: .45 },
-  { k: 2, x: 735, kind: 'inv', s: .6, t: 11.45, seed: 395 },
-  { k: 4, x: 1140, kind: 'neat', s: 1.7, t: 11.8, seed: 400, big: true },
-  { k: 4, x: 1350, kind: 'neat', s: .85, t: 12.2, seed: 365, lean: -.35 },
+  { k: 1, x: 870, s: .8, t: 8.4, seed: 180, first: true },
+  { k: 2, x: 835, s: .8, wf: 1.3, t: 8.7, seed: 300 },
+  { k: 3, x: 690, s: .8, wf: .8, t: 8.95, seed: 310 },
+  { k: 3, x: 915, s: .95, wf: 1.4, t: 9.2, seed: 320 },
+  { k: 2, x: 1010, s: .7, wf: .85, hk: 1.2, t: 9.45, seed: 410 },
+  { k: 2, x: 1290, s: .8, wf: .75, t: 9.7, seed: 330 },
+  { k: 3, x: 1330, s: .85, wf: 1.25, t: 9.95, seed: 340 },
+  { k: 4, x: 757, s: .8, hk: 1.6, t: 10.2, seed: 350 },
+  { k: 1, x: 1215, s: .65, wf: 1.2, t: 10.45, seed: 370 },
+  { k: 4, x: 617, s: .8, wf: .9, t: 10.7, seed: 360, pose: 'flip' },
+  { k: 4, x: 870, s: .7, wf: 1.3, t: 10.95, seed: 390, pose: 'lie', dir: 1 },
+  { k: 4, x: 1460, s: .95, wf: .8, hk: .7, t: 11.2, seed: 380 },
+  { k: 2, x: 725, s: .6, wf: 1.35, t: 11.45, seed: 395 },
+  { k: 4, x: 1140, s: 1.7, t: 11.8, seed: 400, big: true },
+  { k: 4, x: 1350, s: .85, wf: .85, t: 12.2, seed: 365, lean: -.35 },
 ];
 // 画的顺序：后排先画，前排压在上面；同一层按表里的顺序（歪靠的那个画在大个子后面，压住它的袖子）
 const S4SHELFZ = S4SHELF.map((d, i) => [d, i]).sort((a, b) => a[0].k - b[0].k || a[1] - b[1]).map(q => q[0]);
 // s4Pose：台上人偶的下摆中点和转角。侧躺垫高半个袖宽；倒放时下摆朝上、头发顶着台面；歪靠时垫高一点，让下摆的一角着地
-function s4Pose(d) { const y = S4TIER[d.k].y + 10, s = d.s;
-  if (d.pose === 'lie') return [d.x, y - 68 * s, (d.dir || 1) * Math.PI / 2];
-  if (d.pose === 'flip') return [d.x, y + (s4DollTop(d.kind, d.hk, d.hshape) + 3) * s, Math.PI];
-  if (d.lean) return [d.x, y - s * (49.5 * Math.abs(Math.sin(d.lean)) + 9 * Math.cos(d.lean) - 9), d.lean];
+function s4Pose(d) { const y = S4TIER[d.k].y + 10, s = d.s, wf = d.wf || 1;
+  if (d.pose === 'lie') return [d.x, y - 74 * wf * s, (d.dir || 1) * Math.PI / 2];
+  if (d.pose === 'flip') return [d.x, y + (s4DollTop(d.hk) + 3) * s, Math.PI];
+  if (d.lean) return [d.x, y - s * 70 * wf * Math.abs(Math.sin(d.lean)), d.lean];
   return [d.x, y, 0]; }
 function s4Tiers(c, sd) { const x = S4.SX;
   // 屏风：最上层后面四扇折起来的屏风（照雏坛的样子）
@@ -332,7 +331,7 @@ function s4Shelf(c, tau, sd) { const t = twos(tau), big = S4SHELF.find(d => d.bi
     let dy = 0, sx = 1, sy = 1; if (d.first && u < 2 / 12) dy = u < 1 / 12 ? -700 : -260; else if (u < 1 / 12) { dy = -48; sx = .94; sy = 1.08; } else if (u < 2 / 12) { sx = 1.08; sy = .9; }
     const jolt = d.big ? 0 : settle(t, big.t + 1 / 12, { amp: .16, freq: 2.2, decay: 5 }) * Math.sign(d.x - big.x) * (d.k >= 3 ? 1 : .3);
     pop(c, d.x, y, sx, () => { c.save(); c.translate(d.x, y); c.rotate(jolt); c.translate(-d.x, -y);
-      s4Doll(c, ox, oy + dy, d.s, { kind: d.kind, seed: d.seed + (d.first ? 0 : sd % 7), rot, hk: d.hk, hshape: d.hshape }); c.restore(); }, sy); } }
+      s4Doll(c, ox, oy + dy, d.s, { seed: d.seed + (d.first ? 0 : sd % 7), rot, hk: d.hk, wf: d.wf }); c.restore(); }, sy); } }
 
 // ===================== 镜头 D、E：河岸与水墨小溪（和陈列台在同一张纸上，往下摇） =====================
 const S4STONE = [{ y: 1060, hw: 760 }, { y: 1150, hw: 1150 }, { y: 1236, hw: 1600 }];
@@ -387,20 +386,20 @@ function s4FgReeds(c, t, baseY) { const sd = tick(t);
 
 // ---- 漂流物：纸船上的人偶、装头像的漂流瓶。x = x0 + v·(t − T0)；人偶漂到 PULL 时，头上的厄被缎带卷走 ----
 const S4FLOAT = [
-  { doll: 'neat', lane: 1745, x0: 960, v: 360, seed: 11 },
-  { doll: 'neat', big: true, lane: 1748, x0: 730, v: 300, seed: 15 },
-  { doll: 'cut', lane: 1745, x0: 145, v: 350, seed: 12 },
-  { doll: 'twins', lane: 1745, x0: -220, v: 380, seed: 13 },
+  { doll: true, lane: 1745, x0: 960, v: 360, seed: 11 },
+  { doll: true, big: true, lane: 1748, x0: 730, v: 300, seed: 15 },
+  { doll: true, wf: .8, lane: 1745, x0: 145, v: 350, seed: 12 },
+  { doll: true, wf: 1.35, lane: 1745, x0: -220, v: 380, seed: 13 },
   { ph: 'bottle1', lane: 1862, x0: 650, v: 350, seed: 21 },
-  { doll: 'head', lane: 1860, x0: 338, v: 370, seed: 14 },
+  { doll: true, wf: 1.1, hk: 1.3, lane: 1860, x0: 338, v: 370, seed: 14 },
   { ph: 'bottle3', lane: 1862, x0: -600, v: 400, seed: 23 },
   { ph: 'bottle2', lane: 1970, x0: -150, v: 360, seed: 22 },
-  { doll: 'drawn', lane: 1860, x0: -800, v: 370, seed: 16 },
-  { doll: 'inv', lane: 1968, x0: -1000, v: 350, seed: 17 },
+  { doll: true, wf: .9, hk: .8, lane: 1860, x0: -800, v: 370, seed: 16 },
+  { doll: true, wf: 1.2, lane: 1968, x0: -1000, v: 350, seed: 17 },
 ];
 // s4Ride：船和人偶的大小。ds 人偶倍数；hs 船的倍数，船长（248·hs）约为人偶肩宽的 2.1 倍；
 //   dv 人偶下摆在船里的高度：前舷（v = -44）盖住衣服下面 35%；sink 大个子的船吃水更深
-function s4Ride(o) { const ds = o.big ? 1.05 : .62, wide = o.doll === 'twins' ? 1.25 : 1, hs = 2.1 * 130 * wide * ds / 248;
+function s4Ride(o) { const ds = o.big ? 1.05 : .62, wide = o.wf || 1, hs = 2.1 * 130 * wide * ds / 248;
   return { ds, hs, dv: -44 + .35 * 152 * ds / hs, sink: o.big ? 12 : 0 }; }
 S4FLOAT.forEach(o => { if (o.doll) { o.tp = S4.T0 + (S4.PULL - o.x0) / o.v; o.ride = s4Ride(o); } });
 const S4PULLS = S4FLOAT.filter(o => o.doll).sort((a, b) => a.tp - b.tp);
@@ -443,17 +442,14 @@ function s4Wet(c, x, wl, hw, depth, t, sd) { const s = sd + tick(t);
   stroke(c, [[x - hw * .7, wl + depth * .5], [x + hw * .6, wl + depth * .55]], { w: 2.4, color: K.g2, dry: .4, seed: s + 1 });
   for (const d of [-1, 1]) { stroke(c, [[x + d * (hw - 16), wl + 1], [x + d * (hw + 26), wl - 2], [x + d * (hw + 70), wl + 2]], { w: 3.2, color: K.ink, seed: s + 3 + d, taper: .6 });
     stroke(c, [[x + d * (hw + 20), wl + 14], [x + d * (hw + 60), wl + 12], [x + d * (hw + 96), wl + 15]], { w: 2, color: K.g3, seed: s + 5 + d, taper: .6, dry: .3 }); } }
-// s4DollShape：倒影用的人偶外轮廓（局部坐标的几块多边形）
-function s4DollShape(kind) { const head = o => { const g = s4HeadGeo(o), H = ([u, v]) => [g.cu + u * g.rx, g.cv + v * g.ry]; return [ellPts(0, 0, 1, 1, 0, 20).map(H), S4HAIR.map(H)]; };
-  if (kind === 'drawn') return [S4DRAWNCARD];
-  if (kind === 'head') return head({ cv: S4HEADC });
-  if (kind === 'twins') return [S4LINING.map(([u, v]) => [u * 1.25, v]), ...head({ k: S4TWK, du: -S4TWU }), ...head({ k: S4TWK, du: S4TWU })];
-  return [kind === 'cut' ? S4ROBE : S4LINING, ...head({ shape: kind === 'cut' ? 'square' : 'round' })]; }
+// s4DollShape：倒影用的人偶外轮廓（局部坐标的几块多边形）：荷叶边、裙子、头、头发、头顶蝴蝶结的包络
+function s4DollShape(o) { const wf = o.wf || 1, g = s4HeadGeo(o.hk), H = ([u, v]) => [g.cu + u * g.rx, g.cv + v * g.ry], B = S4TOPBOW;
+  return [S4FRILL.map(([u, v]) => [u * wf, v]), S4DRESS.map(([u, v]) => [u * wf, v]), ellPts(0, 0, 1, 1, 0, 20).map(H), S4HAIR.map(H), ellPts(B.u, B.v - .1, B.r * 1.05, B.r * .62, B.a, 16).map(H)]; }
 // s4ItemShapes：一个漂流物此刻在画面里的外轮廓（几块多边形）和半宽，倒影用；位置和 drawItem 用同一套算法
 function s4ItemShapes(o, x, y, rot) {
   if (o.ph) { const T = tf(x, y - 64, .72, rot * .7); return { shapes: [M(T, S4GLASS), M(T, S4PLUG)], hw: 84 }; }
   const R = o.ride, Tb = tf(x, y + R.sink, R.hs, rot), [dx, dy] = Tb(0, R.dv), Td = tf(dx, dy, R.ds, rot);
-  return { shapes: [M(Tb, S4BOATSIL), ...s4DollShape(o.doll).map(p => M(Td, p))], hw: 124 * R.hs }; }
+  return { shapes: [M(Tb, S4BOATSIL), ...s4DollShape(o).map(p => M(Td, p))], hw: 124 * R.hs }; }
 // s4Reflect：水里的倒影。几块外轮廓以水线 wl 上下翻转、纵向压扁到一半，深灰、低透明度一次填满（重叠的地方不会更深）；
 //   被 4 道横向的水纹空隙打断，每道空隙长短不一，随时间轻轻左右晃，所以有时整道切断、有时只切一截
 function s4Reflect(c, shapes, x, wl, hw, t, seed) { const path = new Path2D(); let bot = wl;
@@ -518,7 +514,7 @@ function s4River(c, t, sd) { const water = s4Water(c, t);
   const drawItem = ({ o, x }) => { const { y, rot } = s4Bob(o, t);
     if (o.ph) { s4Bottle(c, x, y - 64, .72, rot * .7, o.ph, o.seed * 10 + sd); s4Wet(c, x, y, 86, 20, t, o.seed); return; }
     const R = o.ride; let top = y;
-    s4Boat(c, x, y + R.sink, R.hs, rot, o.seed * 10 + sd, T => { const [dx, dy] = T(0, R.dv); s4Doll(c, dx, dy, R.ds, { kind: o.doll, seed: 180 + o.seed, rot }); top = dy + s4DollTop(o.doll) * R.ds; });
+    s4Boat(c, x, y + R.sink, R.hs, rot, o.seed * 10 + sd, T => { const [dx, dy] = T(0, R.dv); s4Doll(c, dx, dy, R.ds, { seed: 180 + o.seed, rot, wf: o.wf, hk: o.hk }); top = dy + s4DollTop(o.hk) * R.ds; });
     s4Wet(c, x, y, 92 * R.hs, 6 * R.hs + R.sink + 2, t, o.seed);
     yaku.push([x, top, o]); };
   items.filter(q => q.o.lane < 1920).forEach(drawItem);
