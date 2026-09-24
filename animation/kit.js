@@ -210,5 +210,5 @@ function handoffSukima(c) { setView(null); resetT(c); c.fillStyle = SUKIMA_PAPER
 function handoffStream(c) { setView(null); paperBg(c); stroke(c, STREAM, { w: 10, color: K.g3, seed: 5, taper: 0, rough: .25 }); }
 const DOT_R = 34;
 function handoffDot(c) { setView(null); paperBg(c); block(c, ellPts(CX, CY, DOT_R, DOT_R, 0, 40), K.ink, { amp: 1.2, seed: 7, grain: .4 }); }
-const DESK_VIEW = { x: CX, y: CY, zoom: 1.04 };
+const DESK_VIEW = { x: 960, y: 540, zoom: 1.04 };   // 写死数值：kit.js 载入时 CX、CY 还不是 16:9 的值（defineFilm 之后才定）
 function handoffDesk(c) { setView(DESK_VIEW); paperBg(c); s1DeskProps(c); }
