@@ -1,8 +1,9 @@
 'use strict';
-// 第 7 段 北交东方笑话集 发布（约 21 秒）。照 WASTED 方框印章 meme 的排布：四则笑话一则比一则好笑，
+// 第 7 段 北交东方笑话集 发布（约 24.5 秒）。照 WASTED 方框印章 meme 的排布：四则笑话一则比一则好笑，
 // 新的一则从右边进来，旧的一则同时退到左边、被盖上方框 WASTED 章、变灰变暗，下一则进来时被推出画面；
 // 第四则单独停住 2.5 秒后也被盖章。然后聚光灯下亮出最好笑的一则（八云紫的用户资料卡，不盖章），
-// 最后觉之瞳慢慢睁开，对着观众写出「你刚才在脑袋里笑了」，落款后黑场，循环回第 1 段。
+// 最后觉之瞳慢慢睁开，对着观众写出「你刚才在脑袋里笑了」；落款后闭眼，满屏的黑收成桌上一团墨，
+// 钢笔把墨吸回笔尖、抬出画面，留下第 1 段开头的空桌面（7→1 交接画面是 handoffDesk），循环回第 1 段。
 // 盖章的手是古明地恋的：每次只从画面边缘伸进一只袖子和手，第四次才露出她的帽子和闭着的第三只眼。
 // 屏上文字只来自 animation/data/jokes.js（逐字）和 docs/素材事实.md（「北交东方笑话集 发布」「北京交通大学」）。
 //   0      只画 handoffBlack，接第 6 段
@@ -13,8 +14,12 @@
 //   9.5    第 3 则被推出，第 4 则移到正中，单独停住 2.5 秒
 //   12.34  恋的手伸进来，12.64 第 4 则被盖章，她的帽子和闭着的第三只眼从画面下沿露出来
 //   13.14  一格黑场后聚光灯亮：八云紫的用户资料卡
-//   18.44  觉之瞳睁开，片尾
-//   20.79  只画 handoffBlack（段长 20.91 秒）
+//   18.44  觉之瞳睁开，写出「你刚才在脑袋里笑了」和落款，停到 22.04
+//   22.04  觉之瞳闭眼，左下那根线缩回墨团，白描边收掉
+//   22.39  满屏的黑往里收，成了桌上一团墨（底下是第 1 段的空桌面），字跟着被吃掉
+//   23.09  墨团落定，眼皮线收回
+//   23.29  钢笔从右上角进来，23.64 把墨吸回笔尖，24.04 抬出画面
+//   24.34  只画 handoffDesk，接第 1 段（段长 24.46 秒）
 
 const S7 = {
   P: 800, Y: 588, XL: 500, XR: 1420, XC: 960, OFFR: 2340, OFFL: -420,   // 方形面板边长、中心高度；左、右、正中三个位置，右边外、左边外
@@ -25,8 +30,14 @@ const S7 = {
 S7.HIT4 = S7.T4 + S7.MOVE + S7.HOLD + .3;    // 停够 2.5 秒后手才伸进来，0.3 秒后落章
 S7.C0 = S7.HIT4 + .5;                        // 冠军
 S7.O0 = S7.C0 + 5.3;                         // 片尾
-S7.OUT = S7.O0 + 2.35;                       // 只画 handoffBlack
+// 片尾里的时刻（相对 S7.O0）：闭眼、满屏的黑开始收、墨团落定、眼皮线收完、钢笔进来、吸墨、钢笔抬走、只剩空桌面
+S7.OT = { close: 3.6, shut: 3.95, land: 4.65, lidOff: 4.85, pen: 4.85, suck: 5.2, lift: 5.6, gone: 5.9 };
+S7.OUT = S7.O0 + S7.OT.gone;                 // 只画 handoffDesk，接第 1 段
 S7.END = S7.OUT + .12;
+// 片尾的眼（屏幕坐标，中心 x 是 CX）；收墨：起始半径（盖满全屏：眼到画面最远的角约 1140）、落在桌上的半径（第 1 段墨团平静后 118 + 8）、
+// 收到最后字比墨团的边早吃掉多少（免得主句的字头留在桌上那团墨里）；笔尖停在墨团中心上方多远（贴着墨团顶）、钢笔进出的位置和笔杆朝向（同第 1 段）
+S7.EYE = { y: 380, R: 150 };
+S7.INK = { R0: 1320, R: 126, eat: 70, nib: 113, pen0: [1500, -300], a: -.95 };
 // 每块面板的行程：[开始时刻, 从 x, 到 x]。像传送带，新的一则进来就把整排往左推一格
 S7.LEGS = [
   [[S7.IN0, S7.OFFR, S7.XC], [S7.T1, S7.XC, S7.XL], [S7.T2, S7.XL, S7.OFFL]],
@@ -350,20 +361,52 @@ function s7Swallow(c, xa, xb, yc, g, sd) { const len = sm(0, .12, g, easeOutQuin
     scratch(c, pts, { w: lerp(2, 3.4, open), seed: sd + 3 + j * 7, dry: .12, taper: .4 }); });
   const bk = 30 * sm(.06, .16, g, easeOutBack) * (1 - sm(.5, .6, g)); s7Bow(c, a[0], a[1], bk, sd + 20, -.06); s7Bow(c, b[0], b[1], bk, sd + 30, .06); }
 
-// ===================== 第三幕：觉之瞳睁开，片尾 =====================
+// ===================== 第三幕：觉之瞳睁开，片尾；闭眼后收成桌上一团墨，钢笔吸回去（7→1 交接） =====================
+// 片头倒着走一遍：第 1 段是 空桌面 → 钢笔滴墨 → 墨团 → 闭着的觉之瞳；这里是 觉之瞳闭眼 → 满屏的黑收成桌上的墨团 → 钢笔吸回 → 空桌面
 const S7CORD = Array.from({ length: 61 }, (_, k) => { const u = k / 60; return [lerp(852, -40, u) + 26 * Math.sin(u * 7) * u, lerp(500, 780, u) + 44 * Math.sin(u * 5 + 1) * u]; });
-function s7Outro(c, tau) { const ot = tau - S7.O0, t = twos(tau), sd = 950 + tick(t, 8); setView(null); inkBg(c); if (ot < .1) return;
-  const ex = CX, ey = 380, R = 150, open = sm(.2, 1.05, ot, easeInOutSine);
-  scratch(c, S7CORD, { w: 4, seed: sd, taper: .08 });
-  block(c, ellPts(ex, ey, R, R * .95, .2, 56), K.ink, { amp: R * .04, freq: 11, seed: sd + 1, grain: .6 });
-  outline(c, rough(ellPts(ex, ey, R + 5, R * .95 + 5, .2, 56), { amp: R * .04, freq: 11, seed: sd + 1 }), { w: 3.6, color: K.paper, seed: sd + 2, smooth: false, rough: .3 });
-  eyeLines(c, ex, ey, R * .56, { open, lid: 1, seed: sd + 3 });
+// s7OutroText：主句和落款（屏幕坐标）
+function s7OutroText(c, ot) {
   zh(c, JOKE_OUTRO, CX, 730, { size: 88, weight: 500, color: K.paper, align: 'center', p: writeP(ot, .4, JOKE_OUTRO, .04), seed: 960, tilt: .012, jitter: .012 });
   zh(c, '北交东方笑话集 发布', CX, 872, { size: 48, color: K.g1, align: 'center', p: writeP(ot, .9, '北交东方笑话集 发布', .03), seed: 961, tilt: .012, jitter: .012 });
   zh(c, '北京交通大学', CX, 944, { size: 44, color: K.g1, align: 'center', p: writeP(ot, 1.05, '北京交通大学', .03), seed: 962, tilt: .012, jitter: .012 }); }
+// s7Desk：屏幕坐标 → 桌面镜头 DESK_VIEW 里的坐标
+const s7Desk = (x, y) => [DESK_VIEW.x + (x - W / 2) / DESK_VIEW.zoom, DESK_VIEW.y + (y - H / 2) / DESK_VIEW.zoom];
+// s7BlotRing / s7Blot：桌上那团墨。轮廓和 s1Blot(c, x, y, R, { wild: 0, seed: 5, t }) 逐点相同（同一个 rough、同一个 seed），
+// 只是不刷块里的三道白色干刷痕：眼皮线上方的白痕像眉毛（830f811 在片尾的眼上去掉过），满屏大小时还会拉成横穿画面的细白线。
+// s7Blot 返回轮廓的 Path2D，拿去 clip
+const s7BlotRing = (x, y, R, t) => rough(ellPts(x, y, R, R * .95, .2, 56), { amp: R * .05, freq: 11, seed: 5 + tick(t, 8) });
+function s7Blot(c, x, y, R, t) { if (R < .5) return null; return block(c, ellPts(x, y, R, R * .95, .2, 56), K.ink, { amp: R * .05, freq: 11, seed: 5 + tick(t, 8), grain: .6 }); }
+// s7Drop：钢笔吸墨时笔尖和墨团之间的墨柱：尖在笔尖 N，两边切到墨团的圆上（上细下粗的水滴形）。圆里那一截被墨团盖住
+function s7Drop(c, N, C, R, t) { const dx = N[0] - C[0], dy = N[1] - C[1], d = Math.hypot(dx, dy); if (R < .5 || d <= R * 1.02) return;
+  const th = Math.atan2(dy, dx), ph = Math.acos(R / d), nx = -dy / d, ny = dx / d, w0 = 2.5, T = a => [C[0] + R * Math.cos(a), C[1] + R * Math.sin(a)];
+  block(c, [[N[0] + nx * w0, N[1] + ny * w0], T(th + ph), C, T(th - ph), [N[0] - nx * w0, N[1] - ny * w0]], K.ink, { smooth: false, amp: 1.2, freq: 9, seed: 60 + tick(t, 8), grain: .5 }); }
+function s7Outro(c, tau) { const ot = tau - S7.O0, t = twos(tau), ots = t - S7.O0, sd = 950 + tick(t, 8), O = S7.OT, E = S7.EYE, I = S7.INK;
+  // 0–3.95：黑底上的觉之瞳睁开、写字、落款；3.6 起闭眼，那根线缩回墨团，白描边收掉
+  if (ot < O.shut) { setView(null); inkBg(c); if (ot < .1) return;
+    const ex = CX, ey = E.y, R = E.R, shut = sm(O.close, O.shut, ot, easeInOutSine), open = sm(.2, 1.05, ot, easeInOutSine) * (1 - shut);
+    scratch(c, S7CORD, { w: 4, seed: sd, taper: .08, p: 1 - shut });
+    block(c, ellPts(ex, ey, R, R * .95, .2, 56), K.ink, { amp: R * .04, freq: 11, seed: sd + 1, grain: .6 });
+    outline(c, rough(ellPts(ex, ey, R + 5, R * .95 + 5, .2, 56), { amp: R * .04, freq: 11, seed: sd + 1 }), { w: 3.6, color: K.paper, seed: sd + 2, smooth: false, rough: .3, p: 1 - shut });
+    eyeLines(c, ex, ey, R * .56, { open, lid: 1, seed: sd + 3 });
+    s7OutroText(c, ot); return; }
+  // 3.95 起：桌面在底下（之后都在 DESK_VIEW 坐标里画）
+  handoffDesk(c); const [bx, by] = S1.blot, N = [bx + 2, by - I.nib];
+  // 3.95–4.65：满屏的黑收成桌上一团墨，闭着的眼跟着移到墨团中心；字只画在墨团里，纸从四周露出来时字被吃掉
+  if (ot < O.land) { const u = clamp((ot - O.shut) / (O.land - O.shut), 0, 1), e = easeIO(u), [x0, y0] = s7Desk(CX, E.y);
+    const x = lerp(x0, bx, e), y = lerp(y0, by, e), R = lerp(I.R0, I.R, e);
+    s7Blot(c, x, y, R, t);
+    c.save(); c.clip(polyPath(s7BlotRing(x, y, Math.max(1, R - I.eat * sm(.6, 1, u)), t))); resetT(c); s7OutroText(c, ot); c.restore();
+    eyeLines(c, x, y, lerp(E.R * .56 / DESK_VIEW.zoom, I.R * .52, e), { open: 0, lid: 1, seed: sd + 3 }); return; }
+  // 4.65–4.85：墨团停在桌上，眼皮线收回。4.85 起钢笔进来，笔尖贴着墨团顶停住；5.2 起墨团被吸回笔尖，中间拉出一道墨柱，跟着变短；5.6 起钢笔抬走
+  const su = clamp((ot - O.suck) / .4, 0, 1), R = I.R * (1 - easeIn(su)), g = sm(.72, 1, su, easeIn), C = [lerp(bx, N[0], g), lerp(by, N[1], g)];
+  s7Drop(c, N, C, R, t); s7Blot(c, C[0], C[1], R, t);
+  const lid = 1 - sm(O.land, O.lidOff, ots); if (lid > 0) eyeLines(c, bx, by, I.R * .52, { open: 0, lid, seed: sd + 3 });
+  const pin = sm(O.pen, O.pen + .3, ots, easeOutQuint), pout = sm(O.lift, O.lift + .3, ots, easeIn), P = I.pen0;
+  if (pin > 0 && pout < 1) s1Pen(c, lerp(lerp(P[0], N[0], pin), P[0], pout), lerp(lerp(P[1], N[1], pin), P[1], pout), I.a, 91 + tick(t, 8)); }
 
 scene({ order: 7, key: 'jokes', name: '北交东方笑话集', dur: S7.END, fn: (c, tau) => {
-  if (tau < .12 || tau >= S7.OUT) handoffBlack(c);
+  if (tau < .12) handoffBlack(c);
+  else if (tau >= S7.OUT) handoffDesk(c);
   else if (tau < S7.C0) s7Contest(c, tau);
   else if (tau < S7.O0) s7Champion(c, tau);
   else s7Outro(c, tau);
